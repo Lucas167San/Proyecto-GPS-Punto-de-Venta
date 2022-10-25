@@ -61,7 +61,7 @@
           <Color blue="66" green="0" red="66" type="rgb"/>
         </Property>
         <Property name="horizontalAlignment" type="int" value="0"/>
-        <Property name="text" type="java.lang.String" value="PRODUCTOS BAJOS DE INVENTARIO"/>
+        <Property name="text" type="java.lang.String" value="PRODUCTOS BAJOS DE INVENTARIO123"/>
       </Properties>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">

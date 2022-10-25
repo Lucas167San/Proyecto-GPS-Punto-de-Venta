@@ -37,7 +37,7 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
         jLabel1.setFont(new java.awt.Font("Lucida Console", 3, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(102, 0, 102));
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setText("PRODUCTOS BAJOS DE INVENTARIO");
+        jLabel1.setText("PRODUCTOS BAJOS DE INVENTARIO123");
 
         jTableVenta.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
