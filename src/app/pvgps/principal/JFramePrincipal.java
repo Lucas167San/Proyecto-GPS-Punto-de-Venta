@@ -74,7 +74,6 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jLabel1.setText("Codigo de producto:");
 
-        jTextCodigoProd.setText("HOla");
         jTextCodigoProd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextCodigoProdActionPerformed(evt);

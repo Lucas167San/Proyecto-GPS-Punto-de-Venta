@@ -219,9 +219,6 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="jTextCodigoProd">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="HOla"/>
-      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextCodigoProdActionPerformed"/>
       </Events>
