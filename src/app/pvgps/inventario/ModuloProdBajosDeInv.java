@@ -43,7 +43,7 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
                 {null, null, null, null, null, null}
             },
             new String [] {
-                "Codigo de barras", "Descripción del producto", "Precio Venta", "Cantidad", "Importe", "Existencia"
+                "Codigo de barras", "Descripción del producto", "Precio Venta", "Inventario", "Inv. Minimo", "Departamento"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -67,7 +67,7 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 656, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 1040, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addGap(0, 0, Short.MAX_VALUE)))
