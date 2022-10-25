@@ -48,6 +48,8 @@ public class ModuloInventario extends javax.swing.JDialog {
 
         jLabel4.setText("Cantidad");
 
+        jButton1.setBackground(new java.awt.Color(0, 51, 255));
+        jButton1.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jButton1.setText("Agregar cantidad a inventario");
 
         jLabel5.setText("0.00");
