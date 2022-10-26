@@ -4,6 +4,8 @@
  */
 package app.pvgps.principal;
 
+import app.pvgps.inventario.ModuloProductosDialog;
+import app.pvgps.inventario.ModuloModificarEliminar;
 import app.pvgps.inventario.ModuloInventario;
 import app.pvgps.inventario.ModuloProdBajosDeInv;
 import java.awt.print.PrinterException;
@@ -50,6 +52,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jTextTotal = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuPrint = new javax.swing.JMenuItem();
@@ -124,8 +128,15 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jButton1.setText("F12 - COBRAR");
 
+        jLabel3.setText("Cambio:");
+
+        jLabel4.setFont(new java.awt.Font("Lucida Console", 3, 18)); // NOI18N
+        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel4.setText("$0.00");
+
         jMenu1.setText("Archivo");
 
+        jMenuPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/imprimir.png"))); // NOI18N
         jMenuPrint.setText("Imprimir");
         jMenuPrint.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -134,9 +145,11 @@ public class JFramePrincipal extends javax.swing.JFrame {
         });
         jMenu1.add(jMenuPrint);
 
+        jMenuLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/inicio.png"))); // NOI18N
         jMenuLogOut.setText(" Cerrar Sesión.");
         jMenu1.add(jMenuLogOut);
 
+        jMenuExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/salir.png"))); // NOI18N
         jMenuExit.setText(" Salir");
         jMenuExit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -152,6 +165,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jMenu3.setText("Productos");
 
+        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/nuevo.png"))); // NOI18N
         jMenuItem1.setText("Nuevo Producto");
         jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -160,6 +174,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         });
         jMenu3.add(jMenuItem1);
 
+        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/editar.png"))); // NOI18N
         jMenuItem2.setText("Modificar Producto");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -245,19 +260,24 @@ public class JFramePrincipal extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addComponent(jButAgregarProducto)
                         .addGap(0, 165, Short.MAX_VALUE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabTotProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabTotProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(99, 99, 99)))))
                 .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(111, 111, 111))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -275,8 +295,12 @@ public class JFramePrincipal extends javax.swing.JFrame {
                     .addComponent(jLabTotProductos, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel5)
                     .addComponent(jTextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                        .addComponent(jLabel3)))
                 .addContainerGap())
         );
 
@@ -286,6 +310,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jTextCodigoProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodigoProdActionPerformed
         // TODO add your handling code here:
+        jButAgregarProducto.doClick();
         
     }//GEN-LAST:event_jTextCodigoProdActionPerformed
 
@@ -295,7 +320,11 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuPrintActionPerformed
 
-        
+        try {
+            jTableVenta.print();
+        } catch (PrinterException ex) {
+            Logger.getLogger(JFramePrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }//GEN-LAST:event_jMenuPrintActionPerformed
 
@@ -403,6 +432,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabTotProductos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
