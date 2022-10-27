@@ -27,7 +27,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
      */
     
     
-    
+    ModuloCobrar cobrar;
     public JFramePrincipal() {
         initComponents();
         
@@ -53,7 +53,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jTextTotal = new javax.swing.JTextField();
         jButton1 = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
+        jLabChange = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuPrint = new javax.swing.JMenuItem();
@@ -124,15 +124,25 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jTextTotal.setEditable(false);
         jTextTotal.setBackground(new java.awt.Color(102, 255, 255));
         jTextTotal.setFont(new java.awt.Font("Calibri", 2, 36)); // NOI18N
-        jTextTotal.setText("$0.00");
+        jTextTotal.setText("398");
+        jTextTotal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextTotalActionPerformed(evt);
+            }
+        });
 
         jButton1.setText("F12 - COBRAR");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Cambio:");
 
-        jLabel4.setFont(new java.awt.Font("Lucida Console", 3, 18)); // NOI18N
-        jLabel4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel4.setText("$0.00");
+        jLabChange.setFont(new java.awt.Font("Lucida Console", 3, 18)); // NOI18N
+        jLabChange.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabChange.setText("$0.00");
 
         jMenu1.setText("Archivo");
 
@@ -273,7 +283,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jTextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabChange, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(99, 99, 99)))))
@@ -299,7 +309,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
+                        .addComponent(jLabChange, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
                         .addComponent(jLabel3)))
                 .addContainerGap())
         );
@@ -391,6 +401,28 @@ public class JFramePrincipal extends javax.swing.JFrame {
         modulo.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        cobrar = new ModuloCobrar(this, true);
+        
+        
+        
+        cobrar.setVisible(true);
+        
+        jLabChange.setText(cobrar.getChange());
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jTextTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextTotalActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextTotalActionPerformed
+
+    public String getTotal(){
+        return jTextTotal.getText();
+    }
+    
+    public void setChange(String cambio){
+        jLabChange.setText(cambio);
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -429,11 +461,11 @@ public class JFramePrincipal extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButAgregarProducto;
     private javax.swing.JButton jButton1;
+    private javax.swing.JLabel jLabChange;
     private javax.swing.JLabel jLabTotProductos;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
