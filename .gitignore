@@ -27,3 +27,7 @@ build\databases\DataBases\PuntoDeVenta\db.lck
 /nbproject/private/
 /Lib21/build/
 /Lib21/nbproject/private/
+nbproject/private/private.properties
+build/databases/DataBases/PuntoDeVenta/db.lck
+build/databases/DataBases/PuntoDeVenta/log/log.ctrl
+build/databases/DataBases/PuntoDeVenta/log/logmirror.ctrl
