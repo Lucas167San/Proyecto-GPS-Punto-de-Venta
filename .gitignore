@@ -23,6 +23,7 @@
 hs_err_pid*
 replay_pid*
 /build/classes/
+build\databases\DataBases\PuntoDeVenta\db.lck
 /nbproject/private/
 /Lib21/build/
 /Lib21/nbproject/private/
