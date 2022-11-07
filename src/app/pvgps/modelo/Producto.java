@@ -9,31 +9,27 @@ package app.pvgps.modelo;
  * @author luxxo
  */
 public class Producto {
-    private int CodBarras;
+    private String CodBarras;
     private String Descripcion;
-    private double precio;
-    private int cantidad;
-    private int importe;
-    private int existencia;
-    private String departamento;
+    private double Precio;
+    private double Importe;
+    private int prod_existencia;
 
-    public Producto(int CodBarras, String Descripcion, double precio, int cantidad, int importe, int existencia, String departamento) {
+    public Producto(String CodBarras, String Descripcion, double Precio, double Importe, int prod_existencia) {
         this.CodBarras = CodBarras;
         this.Descripcion = Descripcion;
-        this.precio = precio;
-        this.cantidad = cantidad;
-        this.importe = importe;
-        this.existencia = existencia;
-        this.departamento = departamento;
+        this.Precio = Precio;
+        this.Importe = Importe;
+        this.prod_existencia = prod_existencia;
     }
 
     
 
-    public int getCodBarras() {
+    public String getCodBarras() {
         return CodBarras;
     }
 
-    public void setCodBarras(int CodBarras) {
+    public void setCodBarras(String CodBarras) {
         this.CodBarras = CodBarras;
     }
 
@@ -46,53 +42,38 @@ public class Producto {
     }
 
     public double getPrecio() {
-        return precio;
+        return Precio;
     }
 
     public void setPrecio(double precio) {
-        this.precio = precio;
+        this.Precio = precio;
     }
 
-    public int getCantidad() {
-        return cantidad;
+    
+
+    public double getImporte() {
+        return Importe;
     }
 
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
-    }
-
-    public int getImporte() {
-        return importe;
-    }
-
-    public void setImporte(int importe) {
-        this.importe = importe;
+    public void setImporte(double importe) {
+        this.Importe = importe;
     }
 
     public int getExistencia() {
-        return existencia;
+        return prod_existencia;
     }
 
     public void setExistencia(int existencia) {
-        this.existencia = existencia;
+        this.prod_existencia = existencia;
     }
 
-    public String getDepartamento() {
-        return departamento;
-    }
-
-    public void setDepartamento(String departamento) {
-        this.departamento = departamento;
-    }
     
     public String toString()
     {
         return "Codigo de barras: " + CodBarras + "\n\n "
                 + "Descripcion del producto: " + Descripcion + "\n\n "
-                + "Precio venta: " + precio + "\n\n "
-                + "Cantidad: " + cantidad + "\n\n "
-                + "Importe: " + importe + "\n\n "
-                + "Existencia: " + existencia + "\n\n " 
-                + "Departamento: " + departamento + "";
+                + "Precio venta: " + Precio + "\n\n "
+                + "Importe: " + Importe + "\n\n "
+                + "Existencia: " + prod_existencia;
     }
 }

@@ -4,6 +4,17 @@
  */
 package app.pvgps.inventario;
 
+import app.pvgps.modelo.ModuloProductos;
+import app.pvgps.principal.JFramePrincipal;
+import static app.pvgps.principal.JFramePrincipal.PRODUCTOS_POR_COD_BARRAS;
+import static app.pvgps.principal.JFramePrincipal.TIT_MOD_PROD;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.Properties;
+import java.util.Vector;
+import javax.swing.JOptionPane;
+import mx.tecnm.tap.jdbc.EjecutorSQL;
+
 /**
  *
  * @author luxxo
@@ -13,8 +24,15 @@ public class ModuloModificarEliminar extends javax.swing.JDialog {
     /**
      * Creates new form ModuloModificarEliminar
      */
+    private  JFramePrincipal    frmPrincipal;
+     private ModuloProductos    modelo;
+     private String             accion;
+     private Vector<String>     vecTiposColumnas;
+     private String             sql;
+     private Properties         propConsultasSQL;
+    
     public ModuloModificarEliminar(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+        super(parent, true);
         initComponents();
     }
 
@@ -28,21 +46,37 @@ public class ModuloModificarEliminar extends javax.swing.JDialog {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        jTextCodBarras = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jButEliminar = new javax.swing.JButton();
+        jButCancelar = new javax.swing.JButton();
 
         jLabel1.setText("Codigo de barras");
+
+        jTextCodBarras.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextCodBarrasActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("Lucida Console", 3, 24)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(0, 0, 204));
         jLabel8.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel8.setText("MODIFICAR PRODUCTO");
+        jLabel8.setText("ELIMINAR PRODUCTO");
 
-        jButton1.setText("Buscar");
+        jButEliminar.setText("Eliminar");
+        jButEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButEliminarActionPerformed(evt);
+            }
+        });
 
-        jButton2.setText("Cancelar");
+        jButCancelar.setText("Cancelar");
+        jButCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButCancelarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -60,10 +94,10 @@ public class ModuloModificarEliminar extends javax.swing.JDialog {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jButton1)
+                                        .addComponent(jButEliminar)
                                         .addGap(84, 84, 84)
-                                        .addComponent(jButton2))
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(jButCancelar))
+                                    .addComponent(jTextCodBarras, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE))
                                 .addGap(96, 96, 96))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel1)
@@ -77,17 +111,68 @@ public class ModuloModificarEliminar extends javax.swing.JDialog {
                 .addGap(18, 18, 18)
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jTextCodBarras, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2))
+                    .addComponent(jButEliminar)
+                    .addComponent(jButCancelar))
                 .addGap(35, 35, 35))
         );
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextCodBarrasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodBarrasActionPerformed
+        // TODO add your handling code here:
+        jButEliminar.doClick();
+    }//GEN-LAST:event_jTextCodBarrasActionPerformed
+
+    private void jButCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButCancelarActionPerformed
+        // TODO add your handling code here:
+        dispose();
+    }//GEN-LAST:event_jButCancelarActionPerformed
+
+    private void jButEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButEliminarActionPerformed
+        // TODO add your handling code here:
+        
+        int confirma = JOptionPane.showConfirmDialog( this, "Eliminar el registro seleccionado ?",
+                                     "eliminar", 
+                                     JOptionPane.YES_NO_OPTION, 
+                                     JOptionPane.QUESTION_MESSAGE
+        );
+        
+        if( confirma == JOptionPane.NO_OPTION )
+            return;
+        
+        String  valorLlavePrimaria   = jTextCodBarras.getText();
+        String  tipoLlavePrimaria    = vecTiposColumnas.elementAt ( 0 );
+        
+        String sql = "DELETE FROM PRODUCTOS WHERE COD_BARRAS = ?";
+       
+        Object [][] args = {{ tipoLlavePrimaria , valorLlavePrimaria }};
+        
+        try {
+            int registros = EjecutorSQL.sqlEjecutar( sql, args );
+            if ( registros == 1 )
+            {
+                frmPrincipal.desplegarRegistros(sql, args);
+                frmPrincipal.getJButAgregarProducto().doClick();
+                JOptionPane.showMessageDialog( this , "El registro ha sido eliminado ", "Eliminar",
+                        JOptionPane.INFORMATION_MESSAGE );
+            }
+            
+        } catch (SQLIntegrityConstraintViolationException ex)
+           {
+                JOptionPane.showMessageDialog(this, "No se puede eliminar el registro actual "
+                        + "porque tiene registros  asociados en otras tablas"
+                        , "Error,",JOptionPane.ERROR_MESSAGE);
+           }
+            
+        catch (SQLException ex) {
+            JOptionPane.showMessageDialog( this, ex, "Error", JOptionPane.ERROR_MESSAGE );
+        }
+    }//GEN-LAST:event_jButEliminarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -132,10 +217,10 @@ public class ModuloModificarEliminar extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButCancelar;
+    private javax.swing.JButton jButEliminar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextCodBarras;
     // End of variables declaration//GEN-END:variables
 }

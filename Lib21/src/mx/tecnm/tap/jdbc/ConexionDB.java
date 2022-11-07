@@ -27,7 +27,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
- 
     
 //---------------------------------------------------------------------------------------------------
 public class ConexionDB {
@@ -51,9 +50,9 @@ public class ConexionDB {
 	private static String URLConexion = "";
         private static String servidor = "";
         private static String puerto = "";
-        private static String baseDeDatos = "TOPICOS";
-	private static String Usuario = "TOPICOS";
-	private static String Contraseña = "2021";
+        private static String baseDeDatos = "PuntoDeVenta";
+	private static String Usuario = "administrador";
+	private static String Contraseña = "admin";
 
 //---------------------------------------------------------------------------------------------------      
     private ConexionDB()
@@ -73,20 +72,23 @@ public class ConexionDB {
 
 //---------------------------------------------------------------------------------------------------
     //metodo que sirve para hacer la conexion a la base de datos
+    public static SQLException exception;
     public void conectar(String dbms,String servidor, String puerto,  
                          String bd, String usuario, String contraseña)
     {
-        ConexionDB.servidor = servidor;
-        ConexionDB.puerto = puerto;
+        ConexionDB.servidor = "Java DB";
+        ConexionDB.puerto = "";
         ConexionDB.baseDeDatos = bd;
         ConexionDB.Usuario = usuario;
         ConexionDB.Contraseña = contraseña;
         
+            driverJDBC = "org.apache.derby.jdbc.ClientDriver";
+            URLConexion = "jdbc:derby://localhost:1527/";
+        
         //determinar el driver JDBC y la url de conexion
         if(dbms.equals              ( JAVADB ) )
         {
-            driverJDBC = "org.apache.derby.jdbc.ClientDriver";
-            URLConexion = "jdbc:derby://" + servidor + ":" + puerto+"/";
+            
         } else
             if(dbms.equals          ( SQLSERVER ) )
             {
@@ -108,6 +110,8 @@ public class ConexionDB {
         } catch (ClassNotFoundException ex) {
             System.out.println(ex);
         } catch (SQLException ex) {
+            
+             exception = ex;
              System.out.println(ex);
         }
                 

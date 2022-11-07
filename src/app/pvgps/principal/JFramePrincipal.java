@@ -8,12 +8,19 @@ import app.pvgps.inventario.ModuloProductosDialog;
 import app.pvgps.inventario.ModuloModificarEliminar;
 import app.pvgps.inventario.ModuloInventario;
 import app.pvgps.inventario.ModuloProdBajosDeInv;
+import app.pvgps.modelo.ModuloProductos;
 import java.awt.print.PrinterException;
+import java.sql.ResultSet;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import mx.tecnm.tap.extras.AcercaDeDialog;
+import java.sql.SQLException;
+import java.util.Properties;
+import javax.swing.JButton;
+import mx.tecnm.tap.jdbc.*;
 
 /**
  *
@@ -22,15 +29,56 @@ import mx.tecnm.tap.extras.AcercaDeDialog;
 public class JFramePrincipal extends javax.swing.JFrame {
     DefaultTableModel modelo;
    
-    /**
-     * Creates new form JFramePrincipal
-     */
+    public static final String TIT_FRAME                        = "Punto de Venta";
+    public static final String TIT_INICIO                       = "Sistema de ventas EMAVIC";
+    public static final String TIT_MOD_PROD                     = "Producto";
+    
+    public static final String PRODUCTOS_TODOS_POR_NOMBRE       = "productos_todos_por_nombre";
+    public static final String PRODUCTOS_TODOS_SIN_ORDEN        = "productos_todos_sin_orden";
+    public static final String PRODUCTOS_POR_COD_BARRAS         = "productos_por_cod_barras";
+    public static final String PRODUCTOS_ELIMINAR_POR_CODIGO    = "productos_eliminar_por_codigo";
+    public static final String PRODUCTOS_ACTUALIZA_DATOS        = "productos_actualiza_datos";
+    public static final String PRODUCTOS_INSERTA_NUEVO          = "productos_inserta_nuevo";
+    
+    public static final String NUEVO_PROD                       = "Nuevo";
+    public static final String EDITAR_PROD                      = "Editar";
+    
+    private String              moduloActual;
+    private int                 totRegistros;
+    private Vector<String>      vecNombresColumnas;
+    private Vector<String>      vecNombresColumnasBD;
+    private Vector<String>      vecTiposColumnas;
+    private DefaultTableModel   dtmPrincipal;
+    private Properties          propConsultasSQL;
     
     
     ModuloCobrar cobrar;
+    
+    protected void conexionBaseDatos()
+    {
+        ConexionDB.getInstancia().conectar("JAVADB",
+                                           "", 
+                                           "", 
+                                           "PuntoDeVenta",
+                                           "administrador", 
+                                           "admin");
+    }
+    
     public JFramePrincipal() {
-        initComponents();
+        conexionBaseDatos();
         
+        if(ConexionDB.getInstancia().conectado()){
+         JOptionPane.showMessageDialog(this, "Bienvenido",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
+        initComponents();
+        this.setTitle(TIT_FRAME);
+        }else
+        {
+            JOptionPane.showMessageDialog(this, ConexionDB.exception.getMessage()+"",TIT_INICIO,JOptionPane.ERROR_MESSAGE);
+            ConexionDB.getInstancia().desconectar();
+            System.exit(0);
+        }
+      
+        prepararSentenciasSQL ();
     }
 
     /**
@@ -43,7 +91,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
-        jTextCodigoProd = new javax.swing.JTextField();
+        jTextCodigo = new javax.swing.JTextField();
         jButAgregarProducto = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableVenta = new javax.swing.JTable();
@@ -61,8 +109,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jMenuExit = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
         jMenu3 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
+        jMenuNuevoProducto = new javax.swing.JMenuItem();
+        jMenuModifProducto = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
@@ -74,13 +122,13 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jMenuAbout = new javax.swing.JMenuItem();
         jMenuUserManual = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setText("Codigo de producto:");
 
-        jTextCodigoProd.addActionListener(new java.awt.event.ActionListener() {
+        jTextCodigo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextCodigoProdActionPerformed(evt);
+                jTextCodigoActionPerformed(evt);
             }
         });
 
@@ -175,23 +223,23 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jMenu3.setText("Productos");
 
-        jMenuItem1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/nuevo.png"))); // NOI18N
-        jMenuItem1.setText("Nuevo Producto");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        jMenuNuevoProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/nuevo.png"))); // NOI18N
+        jMenuNuevoProducto.setText("Nuevo Producto");
+        jMenuNuevoProducto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                jMenuNuevoProductoActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem1);
+        jMenu3.add(jMenuNuevoProducto);
 
-        jMenuItem2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/editar.png"))); // NOI18N
-        jMenuItem2.setText("Modificar Producto");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+        jMenuModifProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/editar.png"))); // NOI18N
+        jMenuModifProducto.setText("Modificar Producto");
+        jMenuModifProducto.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
+                jMenuModifProductoActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem2);
+        jMenu3.add(jMenuModifProducto);
 
         jMenuItem3.setText("Eliminar Producto");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
@@ -266,7 +314,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                         .addGap(28, 28, 28)
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jTextCodigoProd, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jTextCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jButAgregarProducto)
                         .addGap(0, 165, Short.MAX_VALUE))
@@ -294,7 +342,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextCodigoProd, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jTextCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
                     .addComponent(jButAgregarProducto))
                 .addGap(18, 18, 18)
@@ -318,14 +366,17 @@ public class JFramePrincipal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextCodigoProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodigoProdActionPerformed
+    private void jTextCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodigoActionPerformed
         // TODO add your handling code here:
         jButAgregarProducto.doClick();
         
-    }//GEN-LAST:event_jTextCodigoProdActionPerformed
+    }//GEN-LAST:event_jTextCodigoActionPerformed
 
     private void jButAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButAgregarProductoActionPerformed
         // TODO add your handling code here:
+        prepararVista(TIT_MOD_PROD);
+        String sql = propConsultasSQL.getProperty( PRODUCTOS_POR_COD_BARRAS );
+        desplegarRegistros(sql, null);
     }//GEN-LAST:event_jButAgregarProductoActionPerformed
 
     private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuPrintActionPerformed
@@ -339,6 +390,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuPrintActionPerformed
 
     private void jMenuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuExitActionPerformed
+        ConexionDB.getInstancia().desconectar();
         this.dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuExitActionPerformed
@@ -351,21 +403,35 @@ public class JFramePrincipal extends javax.swing.JFrame {
         dialog.setVisible ( true );
     }//GEN-LAST:event_jMenuAboutActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void jMenuNuevoProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuNuevoProductoActionPerformed
        
-        ModuloProductosDialog dialog = new ModuloProductosDialog(this,true);
+        prepararVista(TIT_MOD_PROD);
+        String sql = propConsultasSQL.getProperty( PRODUCTOS_POR_COD_BARRAS );
+        desplegarRegistros(sql, null);
+        ModuloProductosDialog dialog = new ModuloProductosDialog(this,null);
         
         dialog.setVisible(true);
         
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_jMenuNuevoProductoActionPerformed
 
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+    private void jMenuModifProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuModifProductoActionPerformed
         // TODO add your handling code here:
-        ModuloModificarEliminar dialog = new ModuloModificarEliminar(this,true);
+        
+            int pos = jTableVenta.getSelectedRow();
+            
+            String  cod_barras    = jTableVenta.getValueAt( pos, 0 ).toString ();
+            String  descripcion      = jTableVenta.getValueAt( pos, 1 ).toString ();
+            double  precio    =   Double.parseDouble(jTableVenta.getValueAt( pos, 2 ).toString ());
+            double  importe         = Double.parseDouble(jTableVenta.getValueAt( pos, 3 ).toString () );
+            int     prod_existencia     = Integer.parseInt(jTableVenta.getValueAt( pos, 4 ).toString () );
+            
+            ModuloProductos modelo = new ModuloProductos ( cod_barras, descripcion, precio, importe, prod_existencia);
+        
+        ModuloProductosDialog dialog = new ModuloProductosDialog(this,modelo);
         
         dialog.setVisible(true);
         
-    }//GEN-LAST:event_jMenuItem2ActionPerformed
+    }//GEN-LAST:event_jMenuModifProductoActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         // TODO add your handling code here:
@@ -423,9 +489,114 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jLabChange.setText(cambio);
     }
     
-    /**
-     * @param args the command line arguments
-     */
+    public void prepararVista( String modulo )
+    {   
+        moduloActual = modulo;
+        determinarNombresColumnas                   ( modulo );
+        
+        dtmPrincipal = new DefaultTableModel( vecNombresColumnas, 0 );
+        this.jTableVenta.setModel ( dtmPrincipal );
+    }
+    
+    public void determinarNombresColumnas( String modulo )
+    {
+        vecNombresColumnas      = new Vector<String>    ( );
+        vecNombresColumnasBD    = new Vector<String>    ( );
+        vecTiposColumnas        = new Vector<String>    ( );    
+        
+        if( modulo.equals( TIT_MOD_PROD ) )
+        {
+            vecNombresColumnas.add( "Codigo de Barras" );
+            vecNombresColumnas.add( "Descripción" );
+            vecNombresColumnas.add( "Precio Venta" );
+            vecNombresColumnas.add( "Importe" );
+            vecNombresColumnas.add( "Existencia" );
+            
+            vecNombresColumnasBD.add ( "cod_barras" );
+            vecNombresColumnasBD.add ( "descripcion" );
+            vecNombresColumnasBD.add ( "precio" );
+            vecNombresColumnasBD.add ( "importe" );
+            vecNombresColumnasBD.add ( "prod_existencia" );
+            
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.INT);
+            
+        }
+    }
+    
+    
+    
+    public void prepararSentenciasSQL ( )
+    {
+                    propConsultasSQL = new Properties ( );
+
+                    propConsultasSQL.put    (PRODUCTOS_POR_COD_BARRAS, 
+                                            "SELECT * FROM PRODUCTOS");
+                    
+                    propConsultasSQL.put (   PRODUCTOS_TODOS_POR_NOMBRE,
+                                             "SELECT * FROM PRODUCTOS ORDER BY DESCRIPCION" );
+                    
+                    propConsultasSQL.put (   PRODUCTOS_TODOS_SIN_ORDEN,
+                                             "SELECT * FROM PRODUCTOS" );
+                    
+                    propConsultasSQL.put (   PRODUCTOS_ELIMINAR_POR_CODIGO,
+                                             "DELETE FROM PRODUCTOS WHERE COD_BARRAS = ?" );
+
+                    propConsultasSQL.put(    PRODUCTOS_ACTUALIZA_DATOS,
+                                             "UPDATE PRODUCTOS SET COD_BARRAS = ?, DESCRIPCION = ?, PRECIO = ?, "
+                                           + "IMPORTE = ?, PROD_EXISTENCIA = ?");
+                    
+                    propConsultasSQL.put(    PRODUCTOS_INSERTA_NUEVO,
+                                            "INSERT INTO PRODUCTOS VALUES ( ? , ? , ? , ? , ?)");
+    }
+    
+     public void desplegarRegistros ( String sql, Object[][] args)
+    {
+        
+        ResultSet rs;
+        try
+        {
+            rs = EjecutorSQL.sqlQuery( sql, args );
+            
+            dtmPrincipal = new DefaultTableModel ( vecNombresColumnas , 0 );
+            while( rs.next ( ) )
+            {
+                 Object[] fila = crearFila  ( rs );
+                 dtmPrincipal.addRow ( fila );
+            }
+            
+            rs.close ( );
+                
+            this.jTableVenta.setModel ( dtmPrincipal );
+
+            totRegistros = dtmPrincipal.getRowCount ( ) ;
+            //this.jLabMensajes.setText( totRegistros + " Registros mostrados" );
+            
+        }catch( SQLException ex ){
+            JOptionPane.showMessageDialog ( this, ex, "Error", JOptionPane.INFORMATION_MESSAGE );
+        }
+    }
+     
+     private Object [] crearFila ( ResultSet rs) throws SQLException
+    {
+        if( moduloActual.equals ( TIT_MOD_PROD ) )
+        {
+                 String cod_barras  = rs.getString      ("COD_BARRAS");
+                 String descripcion = rs.getString      ( "Descripcion" );
+                 double precio      = rs.getDouble      ("Precio");
+                 //int  cantidad    = rs.getInt         ("Cantidad");
+                 double importe     = rs.getDouble      ("Importe" );
+                 int prod_existencia= rs.getInt         ("prod_existencia" );
+                 
+                 Object[] fila = { cod_barras, descripcion, precio, importe, prod_existencia};
+                 return fila;
+        }else
+            return null;
+    }
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -477,18 +648,75 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuAbout;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuExit;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     private javax.swing.JMenuItem jMenuItem6;
     private javax.swing.JMenuItem jMenuLogOut;
+    private javax.swing.JMenuItem jMenuModifProducto;
+    private javax.swing.JMenuItem jMenuNuevoProducto;
     private javax.swing.JMenuItem jMenuPrint;
     private javax.swing.JMenuItem jMenuUserManual;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableVenta;
-    private javax.swing.JTextField jTextCodigoProd;
+    private javax.swing.JTextField jTextCodigo;
     private javax.swing.JTextField jTextTotal;
     // End of variables declaration//GEN-END:variables
+    //-------------------------------------------------------------------------------------------- 
+    public String getModuloActual() {
+        return moduloActual;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public void setModuloActual(String moduloActual) {
+        this.moduloActual = moduloActual;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public Vector<String> getVecNombresColumnas() {
+        return vecNombresColumnas;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public void setVecNombresColumnas(Vector<String> vecNombresColumnas) {
+        this.vecNombresColumnas = vecNombresColumnas;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public Vector<String> getVecNombresColumnasBD() {
+        return vecNombresColumnasBD;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public void setVecNombresColumnasBD(Vector<String> vecNombresColumnasBD) {
+        this.vecNombresColumnasBD = vecNombresColumnasBD;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public Vector<String> getVecTiposColumnas() {
+        return vecTiposColumnas;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public void setVecTiposColumnas(Vector<String> vecTiposColumnas) {
+        this.vecTiposColumnas = vecTiposColumnas;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public Properties getPropConsultasSQL() {
+        return propConsultasSQL;
+    }
+//-------------------------------------------------------------------------------------------- 
+    public void setPropConsultasSQL(Properties propConsultasSQL) {
+        this.propConsultasSQL = propConsultasSQL;
+    }
+//-------------------------------------------------------------------------------------------- 
+
+    public JButton getJButAgregarProducto() {
+        return jButAgregarProducto;
+    }
+////-------------------------------------------------------------------------------------------- 
+//    public JButton getjButModulo2() {
+//        return jButModulo2;
+//    }
+////-------------------------------------------------------------------------------------------- 
+//    public JButton getjButModulo3() {
+//        return jButModulo3;
+//    }
+//--------------------------------------------------------------------------------------------      
+    
+    
+    
 }

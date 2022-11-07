@@ -37,6 +37,7 @@ public class EjecutorSQL {
     public static final String INT      = "int";
     public static final String FLOAT    = "float";
     public static final String STRING   = "string";
+    public static final String DOUBLE   = "double";
 
 //--------------------------------------------------------------------------------------------
 
@@ -49,11 +50,10 @@ public class EjecutorSQL {
     {
         
         
-        
         PreparedStatement ps = ConexionDB.getInstancia ( ).getConexion ( )
                                                       .prepareStatement ( sql );
         
-        prepararArgumentos( ps,args );
+       // prepararArgumentos( ps,args );
         
         return ps.executeQuery ( );
     }
@@ -66,7 +66,7 @@ public class EjecutorSQL {
         
         prepararArgumentos ( ps , args );
         
-        return ps.executeUpdate ( );
+        return ps.executeUpdate();
     }
 //----------------------------------------------------------------------------------------
     
@@ -103,9 +103,14 @@ public class EjecutorSQL {
                     break;
                     case STRING   : ps.setString ( numArg , arg [ VALOR ].toString( ) );
                     break;
+                    
+                    case DOUBLE   : ps.setDouble(
+                                                    numArg, 
+                                                    Double.parseDouble(arg [VALOR].toString())
+                                                  );
+                    break;
                 }
                 numArg++;
-            
             }
         }
     }
