@@ -9,7 +9,9 @@ import app.pvgps.inventario.ModuloModificarEliminar;
 import app.pvgps.inventario.ModuloInventario;
 import app.pvgps.inventario.ModuloProdBajosDeInv;
 import app.pvgps.modelo.ModuloProductos;
+import app.pvgps.modelo.Producto;
 import java.awt.print.PrinterException;
+import java.lang.reflect.Array;
 import java.sql.ResultSet;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -18,6 +20,8 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import mx.tecnm.tap.extras.AcercaDeDialog;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Properties;
 import javax.swing.JButton;
 import mx.tecnm.tap.jdbc.*;
@@ -50,9 +54,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private Vector<String>      vecTiposColumnas;
     private DefaultTableModel   dtmPrincipal;
     private Properties          propConsultasSQL;
-    
+    private ArrayList<Producto> array = new ArrayList();
     
     ModuloCobrar cobrar;
+    
     
     protected void conexionBaseDatos()
     {
@@ -77,8 +82,9 @@ public class JFramePrincipal extends javax.swing.JFrame {
             ConexionDB.getInstancia().desconectar();
             System.exit(0);
         }
-      
+
         prepararSentenciasSQL ();
+        
     }
 
     /**
@@ -368,15 +374,49 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jTextCodigoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextCodigoActionPerformed
         // TODO add your handling code here:
+        
         jButAgregarProducto.doClick();
         
     }//GEN-LAST:event_jTextCodigoActionPerformed
 
     private void jButAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButAgregarProductoActionPerformed
-        // TODO add your handling code here:
+        // TODO add your handling code here:   
+        try{
+        prepararSentenciasSQL();
         prepararVista(TIT_MOD_PROD);
         String sql = propConsultasSQL.getProperty( PRODUCTOS_POR_COD_BARRAS );
         desplegarRegistros(sql, null);
+        
+        array.add(new Producto  (dtmPrincipal.getValueAt(0, 0)+"",
+                                dtmPrincipal.getValueAt(0, 1)+"",
+                                Double.parseDouble(dtmPrincipal.getValueAt(0, 2)+""),
+                                Double.parseDouble(dtmPrincipal.getValueAt(0, 3)+""),
+                                Integer.parseInt(dtmPrincipal.getValueAt(0, 4)+"")
+                                ));
+        
+        modelo = new DefaultTableModel(vecNombresColumnas, array.size());
+        jTableVenta.setModel(modelo);
+        jTextCodigo.setText("");
+        jLabTotProductos.setText(array.size()+"");
+        
+        modelo.setRowCount(array.size());
+        modelo.setColumnCount(5);
+        Double total = 0.0;
+        for (int j = 0; j < array.size(); j++) {
+            modelo.setValueAt(array.get(j).getCodBarras(), j, 0);
+            modelo.setValueAt(array.get(j).getDescripcion(), j, 1);
+            modelo.setValueAt(array.get(j).getPrecio(), j, 2);
+            modelo.setValueAt(array.get(j).getImporte(), j, 3);
+            modelo.setValueAt(array.get(j).getExistencia(), j, 4);
+           
+            total += array.get(j).getPrecio();
+        }
+        jTextTotal.setText(total+"");
+        }catch(Exception ex){
+            JOptionPane.showMessageDialog(this, "Producto no encontrado.", "Producto", JOptionPane.ERROR_MESSAGE);
+        }    
+        
+        
     }//GEN-LAST:event_jButAgregarProductoActionPerformed
 
     private void jMenuPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuPrintActionPerformed
@@ -531,10 +571,12 @@ public class JFramePrincipal extends javax.swing.JFrame {
     
     public void prepararSentenciasSQL ( )
     {
+        
+       String valor = jTextCodigo.getText();
                     propConsultasSQL = new Properties ( );
 
                     propConsultasSQL.put    (PRODUCTOS_POR_COD_BARRAS, 
-                                            "SELECT * FROM PRODUCTOS");
+                                            "SELECT * FROM PRODUCTOS WHERE COD_BARRAS = '"+valor+"'");
                     
                     propConsultasSQL.put (   PRODUCTOS_TODOS_POR_NOMBRE,
                                              "SELECT * FROM PRODUCTOS ORDER BY DESCRIPCION" );
@@ -587,11 +629,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
                  String cod_barras  = rs.getString      ("COD_BARRAS");
                  String descripcion = rs.getString      ( "Descripcion" );
                  double precio      = rs.getDouble      ("Precio");
-                 //int  cantidad    = rs.getInt         ("Cantidad");
+                 //int  cantidad      = rs.getInt         ("Cantidad");
                  double importe     = rs.getDouble      ("Importe" );
                  int prod_existencia= rs.getInt         ("prod_existencia" );
-                 
-                 Object[] fila = { cod_barras, descripcion, precio, importe, prod_existencia};
+                 Object[] fila = { cod_barras, descripcion, precio, importe, prod_existencia };
                  return fila;
         }else
             return null;

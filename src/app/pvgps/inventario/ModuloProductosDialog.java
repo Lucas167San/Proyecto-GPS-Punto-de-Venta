@@ -254,11 +254,11 @@ public class ModuloProductosDialog extends javax.swing.JDialog {
              int registros = EjecutorSQL.sqlEjecutar( sql , args );
              if ( registros == 1 )
              {
-                 frmPrincipal.getJButAgregarProducto().doClick();
+
                  JOptionPane.showMessageDialog(this, mensaje, 
                                                 accion, 
                                                 JOptionPane.INFORMATION_MESSAGE);
-               frmPrincipal.getJButAgregarProducto().doClick();
+               
              }
          } catch ( SQLException ex ) {
              dialogoMensaje( ex.toString() ); 

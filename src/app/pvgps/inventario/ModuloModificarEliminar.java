@@ -145,22 +145,27 @@ public class ModuloModificarEliminar extends javax.swing.JDialog {
         if( confirma == JOptionPane.NO_OPTION )
             return;
         
-        String  valorLlavePrimaria   = jTextCodBarras.getText();
-        String  tipoLlavePrimaria    = vecTiposColumnas.elementAt ( 0 );
-        
-        String sql = "DELETE FROM PRODUCTOS WHERE COD_BARRAS = ?";
+//       String  valorLlavePrimaria   = jTextCodBarras.getText();
+//       String  tipoLlavePrimaria    = vecTiposColumnas.elementAt ( 0 );
+//        
+        String valor = jTextCodBarras.getText();
+        String sql = "DELETE FROM PRODUCTOS WHERE COD_BARRAS = '"+valor+"'";
        
-        Object [][] args = {{ tipoLlavePrimaria , valorLlavePrimaria }};
+//        Object [][] args = {{ tipoLlavePrimaria , valorLlavePrimaria }};
         
         try {
-            int registros = EjecutorSQL.sqlEjecutar( sql, args );
+            int registros = EjecutorSQL.sqlEjecutar( sql, null );
             if ( registros == 1 )
             {
-                frmPrincipal.desplegarRegistros(sql, args);
-                frmPrincipal.getJButAgregarProducto().doClick();
+//                frmPrincipal.desplegarRegistros(sql, args);
+//                frmPrincipal.getJButAgregarProducto().doClick();
                 JOptionPane.showMessageDialog( this , "El registro ha sido eliminado ", "Eliminar",
                         JOptionPane.INFORMATION_MESSAGE );
+            }else {
+                JOptionPane.showMessageDialog(this, "No se encontró el producto", "Eliminar", 
+                        JOptionPane.INFORMATION_MESSAGE);
             }
+            
             
         } catch (SQLIntegrityConstraintViolationException ex)
            {

@@ -53,7 +53,7 @@ public class EjecutorSQL {
         PreparedStatement ps = ConexionDB.getInstancia ( ).getConexion ( )
                                                       .prepareStatement ( sql );
         
-       // prepararArgumentos( ps,args );
+        prepararArgumentos( ps,args );
         
         return ps.executeQuery ( );
     }
