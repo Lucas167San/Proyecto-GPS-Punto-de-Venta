@@ -6,6 +6,7 @@ package app.pvgps.inventario;
 
 import app.pvgps.modelo.ModuloProductos;
 import app.pvgps.principal.JFramePrincipal;
+import app.pvgps.principal.ModuloModifProducto;
 import java.sql.SQLException;
 import java.util.Vector;
 import javax.swing.JOptionPane;
@@ -17,7 +18,8 @@ import mx.tecnm.tap.jdbc.EjecutorSQL;
  */
 public class ModuloProductosDialog extends javax.swing.JDialog {
 
-    private  JFramePrincipal    frmPrincipal;
+     private JFramePrincipal    frmPrincipal;
+     private ModuloModifProducto modif;
      private ModuloProductos    modelo;
      private String             accion;
      private Vector<String>     vecTiposColumnas;
@@ -26,17 +28,21 @@ public class ModuloProductosDialog extends javax.swing.JDialog {
     public ModuloProductosDialog(java.awt.Frame parent, ModuloProductos modelo) {
         super(parent, true);
         initComponents();
-        
+
         jTextDepartamento.setVisible(false);
         jLabel7.setVisible(false);
         jSpinCantMinima.setVisible(false);
         
+        
         frmPrincipal = (JFramePrincipal) parent;
         this.modelo = modelo;
         vecTiposColumnas = frmPrincipal.getVecTiposColumnas();
+        //vecTiposColumnas2 = modif.getVecTiposColumnas();
         
-        accion = ( modelo == null)? JFramePrincipal.NUEVO_PROD : JFramePrincipal.EDITAR_PROD;
+        accion = ( modelo == null)? JFramePrincipal.NUEVO_PROD : ModuloModifProducto.EDITAR_PROD;
         setTitle(accion);
+        
+        
         
         inicializarFormulario();
     }
@@ -47,8 +53,9 @@ public class ModuloProductosDialog extends javax.swing.JDialog {
         {
             jCheckInventarioSINO.setVisible(false);
             jTextCodBarras.requestFocus();
-        }else if (accion.equals(JFramePrincipal.EDITAR_PROD))
+        }else if (accion.equals(ModuloModifProducto.EDITAR_PROD))
         {
+            jLabTitutlo.setText(ModuloModifProducto.EDITAR_PROD);
             jCheckInventarioSINO.setVisible(false);
             jTextCodBarras.setText(modelo.getCodBarras());
             jTextDescripcion.setText(modelo.getDescripcion());
@@ -56,7 +63,7 @@ public class ModuloProductosDialog extends javax.swing.JDialog {
             jTextPrecioVenta.setText(modelo.getImporte()+"");
             jSpinCantActual.setValue(modelo.getExistencia());
             
-            jTextCodBarras.requestFocus();
+            jTextCodBarras.setEditable(false);
         }
     }
 
@@ -236,25 +243,33 @@ public class ModuloProductosDialog extends javax.swing.JDialog {
                               { vecTiposColumnas.elementAt( 3 ), modelo.getImporte()},
                               { vecTiposColumnas.elementAt( 4 ), modelo.getExistencia()},
                                   };
-        } else if ( accion.equals( JFramePrincipal.EDITAR_PROD ) )
+        } else if ( accion.equals( ModuloModifProducto.EDITAR_PROD ) )
         {
+            vecTiposColumnas        = new Vector<String>    ( ); 
+            
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.INT);
             mensaje = "El registro ha sido actualizado.";
             
-            sql = frmPrincipal.getPropConsultasSQL().getProperty( JFramePrincipal.PRODUCTOS_ACTUALIZA_DATOS );
-            
-            args = new Object[][] {                  
+            sql =     "UPDATE PRODUCTOS SET DESCRIPCION = ?, PRECIO = ?, IMPORTE = ?, PROD_EXISTENCIA = ? "
+                    + "WHERE COD_BARRAS = '"+modelo.getCodBarras()+"'";
+            args = new Object[][] {              
+                              //{ vecTiposColumnas.elementAt( 0 ), modelo.getCodBarras() },
                               { vecTiposColumnas.elementAt( 1 ), modelo.getDescripcion()},
                               { vecTiposColumnas.elementAt( 2 ), modelo.getPrecio() },
                               { vecTiposColumnas.elementAt( 3 ), modelo.getImporte() },
-                              { vecTiposColumnas.elementAt( 4 ), modelo.getExistencia() },
-                              { vecTiposColumnas.elementAt( 0 ), modelo.getCodBarras() }
+                              { vecTiposColumnas.elementAt( 4 ), modelo.getExistencia() }
+                              
                                   };
         }
         try {
              int registros = EjecutorSQL.sqlEjecutar( sql , args );
              if ( registros == 1 )
              {
-
+                 
                  JOptionPane.showMessageDialog(this, mensaje, 
                                                 accion, 
                                                 JOptionPane.INFORMATION_MESSAGE);

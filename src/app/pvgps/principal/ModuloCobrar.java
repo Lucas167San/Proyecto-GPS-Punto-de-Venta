@@ -15,7 +15,7 @@ public class ModuloCobrar extends javax.swing.JDialog {
     /**
      * Creates new form ModuloCobrar
      */
-    JFramePrincipal frameP = new JFramePrincipal();
+    JFramePrincipal frameP = new JFramePrincipal("");
     
     public ModuloCobrar(java.awt.Frame parent, boolean modal) {
         super(parent, modal);

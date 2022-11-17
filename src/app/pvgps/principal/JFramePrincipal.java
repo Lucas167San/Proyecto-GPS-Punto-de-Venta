@@ -10,6 +10,9 @@ import app.pvgps.inventario.ModuloInventario;
 import app.pvgps.inventario.ModuloProdBajosDeInv;
 import app.pvgps.modelo.ModuloProductos;
 import app.pvgps.modelo.Producto;
+import app.pvgps.sesion.JFrameIniciarSesion;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.print.PrinterException;
 import java.lang.reflect.Array;
 import java.sql.ResultSet;
@@ -34,7 +37,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     DefaultTableModel modelo;
    
     public static final String TIT_FRAME                        = "Punto de Venta";
-    public static final String TIT_INICIO                       = "Sistema de ventas EMAVIC";
+    public static final String TIT_INICIO                       = "Sistema de ventas EMAV";
     public static final String TIT_MOD_PROD                     = "Producto";
     
     public static final String PRODUCTOS_TODOS_POR_NOMBRE       = "productos_todos_por_nombre";
@@ -46,7 +49,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     
     public static final String NUEVO_PROD                       = "Nuevo";
     public static final String EDITAR_PROD                      = "Editar";
-    
+
     private String              moduloActual;
     private int                 totRegistros;
     private Vector<String>      vecNombresColumnas;
@@ -58,6 +61,11 @@ public class JFramePrincipal extends javax.swing.JFrame {
     
     ModuloCobrar cobrar;
     
+    @Override
+    public Image getIconImage(){
+        Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("app/pvgps/iconos/iconoPestañas.png"));
+        return retValue;
+    }
     
     protected void conexionBaseDatos()
     {
@@ -67,26 +75,45 @@ public class JFramePrincipal extends javax.swing.JFrame {
                                            "PuntoDeVenta",
                                            "administrador", 
                                            "admin");
+        
     }
     
-    public JFramePrincipal() {
+    
+    
+    public JFramePrincipal(String usuario) {
         conexionBaseDatos();
         
-        if(ConexionDB.getInstancia().conectado()){
-         JOptionPane.showMessageDialog(this, "Bienvenido",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
-        initComponents();
-        this.setTitle(TIT_FRAME);
-        }else
-        {
+        
+        if(ConexionDB.getInstancia().conectado() && usuario.equals("admin")){
+                JOptionPane.showMessageDialog(this, "Bienvenido admin",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
+                initComponents();
+                this.setTitle(TIT_FRAME + " - Administrador");
+                prepararSentenciasSQL ();
+            
+        }else if (ConexionDB.getInstancia().conectado() && usuario.equals("empleado")){
+            JOptionPane.showMessageDialog(this, "Bienvenido empleado",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
+            initComponents();
+            jMenuClientes.setVisible(false);
+            jMenuProductos.setVisible(false);
+            jMenuConfiguracion.setVisible(false);
+            jMenuCorte.setVisible(false);
+            jMenuInventario.setVisible(false);
+            this.setTitle(TIT_FRAME + " - Empleado");
+                prepararSentenciasSQL ();
+        }else {
             JOptionPane.showMessageDialog(this, ConexionDB.exception.getMessage()+"",TIT_INICIO,JOptionPane.ERROR_MESSAGE);
             ConexionDB.getInstancia().desconectar();
             System.exit(0);
-        }
+           }
+        
+        
+        
 
-        prepararSentenciasSQL ();
         
     }
 
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -113,22 +140,23 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jMenuPrint = new javax.swing.JMenuItem();
         jMenuLogOut = new javax.swing.JMenuItem();
         jMenuExit = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMenu3 = new javax.swing.JMenu();
+        jMenuClientes = new javax.swing.JMenu();
+        jMenuProductos = new javax.swing.JMenu();
         jMenuNuevoProducto = new javax.swing.JMenuItem();
         jMenuModifProducto = new javax.swing.JMenuItem();
         jMenuItem3 = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
+        jMenuInventario = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
-        jMenu5 = new javax.swing.JMenu();
-        jMenu6 = new javax.swing.JMenu();
+        jMenuConfiguracion = new javax.swing.JMenu();
+        jMenuCorte = new javax.swing.JMenu();
         jMenu7 = new javax.swing.JMenu();
         jMenuAbout = new javax.swing.JMenuItem();
         jMenuUserManual = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setIconImage(getIconImage());
 
         jLabel1.setText("Codigo de producto:");
 
@@ -211,6 +239,11 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jMenuLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/inicio.png"))); // NOI18N
         jMenuLogOut.setText(" Cerrar Sesión.");
+        jMenuLogOut.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuLogOutActionPerformed(evt);
+            }
+        });
         jMenu1.add(jMenuLogOut);
 
         jMenuExit.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/salir.png"))); // NOI18N
@@ -224,10 +257,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu1);
 
-        jMenu2.setText("Clientes");
-        jMenuBar1.add(jMenu2);
+        jMenuClientes.setText("Clientes");
+        jMenuBar1.add(jMenuClientes);
 
-        jMenu3.setText("Productos");
+        jMenuProductos.setText("Productos");
 
         jMenuNuevoProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/nuevo.png"))); // NOI18N
         jMenuNuevoProducto.setText("Nuevo Producto");
@@ -236,7 +269,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 jMenuNuevoProductoActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuNuevoProducto);
+        jMenuProductos.add(jMenuNuevoProducto);
 
         jMenuModifProducto.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/editar.png"))); // NOI18N
         jMenuModifProducto.setText("Modificar Producto");
@@ -245,19 +278,20 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 jMenuModifProductoActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuModifProducto);
+        jMenuProductos.add(jMenuModifProducto);
 
+        jMenuItem3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/trash.png"))); // NOI18N
         jMenuItem3.setText("Eliminar Producto");
         jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jMenuItem3ActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem3);
+        jMenuProductos.add(jMenuItem3);
 
-        jMenuBar1.add(jMenu3);
+        jMenuBar1.add(jMenuProductos);
 
-        jMenu4.setText("Inventario");
+        jMenuInventario.setText("Inventario");
 
         jMenuItem4.setText("Agregar a inventario");
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
@@ -265,7 +299,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 jMenuItem4ActionPerformed(evt);
             }
         });
-        jMenu4.add(jMenuItem4);
+        jMenuInventario.add(jMenuItem4);
 
         jMenuItem5.setText("Ajustes de inventario");
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
@@ -273,7 +307,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 jMenuItem5ActionPerformed(evt);
             }
         });
-        jMenu4.add(jMenuItem5);
+        jMenuInventario.add(jMenuItem5);
 
         jMenuItem6.setText("Productos Bajos de Inventario");
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
@@ -281,15 +315,15 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 jMenuItem6ActionPerformed(evt);
             }
         });
-        jMenu4.add(jMenuItem6);
+        jMenuInventario.add(jMenuItem6);
 
-        jMenuBar1.add(jMenu4);
+        jMenuBar1.add(jMenuInventario);
 
-        jMenu5.setText("Configuración");
-        jMenuBar1.add(jMenu5);
+        jMenuConfiguracion.setText("Configuración");
+        jMenuBar1.add(jMenuConfiguracion);
 
-        jMenu6.setText("Corte");
-        jMenuBar1.add(jMenu6);
+        jMenuCorte.setText("Corte");
+        jMenuBar1.add(jMenuCorte);
 
         jMenu7.setText("Ayuda");
 
@@ -456,19 +490,9 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuModifProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuModifProductoActionPerformed
         // TODO add your handling code here:
-        
-            int pos = jTableVenta.getSelectedRow();
-            
-            String  cod_barras    = jTableVenta.getValueAt( pos, 0 ).toString ();
-            String  descripcion      = jTableVenta.getValueAt( pos, 1 ).toString ();
-            double  precio    =   Double.parseDouble(jTableVenta.getValueAt( pos, 2 ).toString ());
-            double  importe         = Double.parseDouble(jTableVenta.getValueAt( pos, 3 ).toString () );
-            int     prod_existencia     = Integer.parseInt(jTableVenta.getValueAt( pos, 4 ).toString () );
-            
-            ModuloProductos modelo = new ModuloProductos ( cod_barras, descripcion, precio, importe, prod_existencia);
-        
-        ModuloProductosDialog dialog = new ModuloProductosDialog(this,modelo);
-        
+  
+        ModuloModifProducto dialog = new ModuloModifProducto(this,null);
+        dialog.setTitle("Inventario");
         dialog.setVisible(true);
         
     }//GEN-LAST:event_jMenuModifProductoActionPerformed
@@ -484,7 +508,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
-        ModuloInventario modinv = new ModuloInventario(this,true);
+        ModuloInventario modinv = new ModuloInventario(this,null);
         
         modinv.setVisible(true);
         
@@ -494,7 +518,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
         // TODO add your handling code here:
-        ModuloInventario modinv = new ModuloInventario(this,true);
+        ModuloInventario modinv = new ModuloInventario(this,null);
         
         modinv.setVisible(true);
         
@@ -502,7 +526,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
         // TODO add your handling code here:
-        ModuloProdBajosDeInv modulo = new ModuloProdBajosDeInv (this, true);
+        ModuloProdBajosDeInv modulo = new ModuloProdBajosDeInv (this, null);
         
         modulo.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
@@ -520,6 +544,14 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private void jTextTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextTotalActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jTextTotalActionPerformed
+
+    private void jMenuLogOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuLogOutActionPerformed
+        // TODO add your handling code here:
+        ConexionDB.getInstancia().desconectar();
+        dispose();
+        JFrameIniciarSesion frame = new JFrameIniciarSesion();
+        frame.setVisible(true);
+    }//GEN-LAST:event_jMenuLogOutActionPerformed
 
     public String getTotal(){
         return jTextTotal.getText();
@@ -579,7 +611,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                                             "SELECT * FROM PRODUCTOS WHERE COD_BARRAS = '"+valor+"'");
                     
                     propConsultasSQL.put (   PRODUCTOS_TODOS_POR_NOMBRE,
-                                             "SELECT * FROM PRODUCTOS ORDER BY DESCRIPCION" );
+                                             "SELECT * FROM PRODUCTOS ORDER BY PROD_EXISTENCIA ASC" );
                     
                     propConsultasSQL.put (   PRODUCTOS_TODOS_SIN_ORDEN,
                                              "SELECT * FROM PRODUCTOS" );
@@ -588,8 +620,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
                                              "DELETE FROM PRODUCTOS WHERE COD_BARRAS = ?" );
 
                     propConsultasSQL.put(    PRODUCTOS_ACTUALIZA_DATOS,
-                                             "UPDATE PRODUCTOS SET COD_BARRAS = ?, DESCRIPCION = ?, PRECIO = ?, "
-                                           + "IMPORTE = ?, PROD_EXISTENCIA = ?");
+                                             "UPDATE PRODUCTOS SET DESCRIPCION = ?, PRECIO = ?, "
+                                           + "IMPORTE = ?, PROD_EXISTENCIA = ? WHERE COD_BARRAS = '"+valor+"'");
                     
                     propConsultasSQL.put(    PRODUCTOS_INSERTA_NUEVO,
                                             "INSERT INTO PRODUCTOS VALUES ( ? , ? , ? , ? , ?)");
@@ -665,7 +697,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new JFramePrincipal().setVisible(true);
+                new JFramePrincipal("").setVisible(true);
             }
         });
     }
@@ -680,15 +712,14 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenu jMenu5;
-    private javax.swing.JMenu jMenu6;
     private javax.swing.JMenu jMenu7;
     private javax.swing.JMenuItem jMenuAbout;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenu jMenuClientes;
+    private javax.swing.JMenu jMenuConfiguracion;
+    private javax.swing.JMenu jMenuCorte;
     private javax.swing.JMenuItem jMenuExit;
+    private javax.swing.JMenu jMenuInventario;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
@@ -697,6 +728,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuModifProducto;
     private javax.swing.JMenuItem jMenuNuevoProducto;
     private javax.swing.JMenuItem jMenuPrint;
+    private javax.swing.JMenu jMenuProductos;
     private javax.swing.JMenuItem jMenuUserManual;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableVenta;

@@ -4,18 +4,64 @@
  */
 package app.pvgps.inventario;
 
-/**
- *
- * @author luxxo
- */
+import app.pvgps.inventario.ModuloProductosDialog;
+import app.pvgps.modelo.ModuloProductos;
+import app.pvgps.principal.JFramePrincipal;
+import static app.pvgps.principal.JFramePrincipal.PRODUCTOS_ACTUALIZA_DATOS;
+import static app.pvgps.principal.JFramePrincipal.PRODUCTOS_ELIMINAR_POR_CODIGO;
+import static app.pvgps.principal.JFramePrincipal.PRODUCTOS_INSERTA_NUEVO;
+import static app.pvgps.principal.JFramePrincipal.PRODUCTOS_POR_COD_BARRAS;
+import static app.pvgps.principal.JFramePrincipal.PRODUCTOS_TODOS_POR_NOMBRE;
+import static app.pvgps.principal.JFramePrincipal.PRODUCTOS_TODOS_SIN_ORDEN;
+import static app.pvgps.principal.JFramePrincipal.TIT_MOD_PROD;
+import static app.pvgps.principal.ModuloModifProducto.PRODUCTOS_ELIMINAR_POR_CODIGO;
+import static app.pvgps.principal.ModuloModifProducto.PRODUCTOS_INSERTA_NUEVO;
+import static app.pvgps.principal.ModuloModifProducto.PRODUCTOS_TODOS_POR_NOMBRE;
+import static app.pvgps.principal.ModuloModifProducto.PRODUCTOS_TODOS_SIN_ORDEN;
+import static app.pvgps.principal.ModuloModifProducto.TIT_MOD_PROD;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.Properties;
+import java.util.Vector;
+import javax.swing.JButton;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import mx.tecnm.tap.jdbc.EjecutorSQL;
 public class ModuloProdBajosDeInv extends javax.swing.JDialog {
 
-    /**
-     * Creates new form ModuloProdBajosDeInv
-     */
-    public ModuloProdBajosDeInv(java.awt.Frame parent, boolean modal) {
-        super(parent, modal);
+    DefaultTableModel modelo;
+   
+    public static final String TIT_FRAME                        = "Punto de Venta";
+    public static final String TIT_INICIO                       = "Sistema de ventas EMAVIC";
+    public static final String TIT_MOD_PROD                     = "Producto";
+    
+    public static final String PRODUCTOS_TODOS_POR_NOMBRE       = "productos_todos_por_nombre";
+    public static final String PRODUCTOS_TODOS_SIN_ORDEN        = "productos_todos_sin_orden";
+    public static final String PRODUCTOS_POR_COD_BARRAS         = "productos_por_cod_barras";
+    public static final String PRODUCTOS_ELIMINAR_POR_CODIGO    = "productos_eliminar_por_codigo";
+    public static final String PRODUCTOS_ACTUALIZA_DATOS        = "productos_actualiza_datos";
+    public static final String PRODUCTOS_INSERTA_NUEVO          = "productos_inserta_nuevo";
+    
+    public static final String NUEVO_PROD                       = "Nuevo";
+    public static final String EDITAR_PROD                      = "Editar";
+    
+    private JFramePrincipal    frmPrincipal;
+    private String              moduloActual;
+    private int                 totRegistros;
+    private Vector<String>      vecNombresColumnas;
+    private Vector<String>      vecNombresColumnasBD;
+    private Vector<String>      vecTiposColumnas;
+    private DefaultTableModel   dtmPrincipal;
+    private Properties          propConsultasSQL;
+    public ModuloProdBajosDeInv(java.awt.Frame parent, ModuloProductos producto) {
+        super(parent, true);
         initComponents();
+        frmPrincipal = (JFramePrincipal) parent;
+            prepararSentenciasSQL();
+            prepararVista(TIT_MOD_PROD);
+            String sql = propConsultasSQL.getProperty( PRODUCTOS_TODOS_POR_NOMBRE );
+            desplegarRegistros(sql, null);
+        
     }
 
     /**
@@ -94,10 +140,115 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+public void prepararVista( String modulo )
+    {   
+        moduloActual = modulo;
+        determinarNombresColumnas                   ( modulo );
+        
+        dtmPrincipal = new DefaultTableModel( vecNombresColumnas, 0 );
+        this.jTableVenta.setModel ( dtmPrincipal );
+    }
+    
+    public void determinarNombresColumnas( String modulo )
+    {
+        vecNombresColumnas      = new Vector<String>    ( );
+        vecNombresColumnasBD    = new Vector<String>    ( );
+        vecTiposColumnas        = new Vector<String>    ( );    
+        
+        if( modulo.equals( TIT_MOD_PROD ) )
+        {
+            vecNombresColumnas.add( "Codigo de Barras" );
+            vecNombresColumnas.add( "Descripción" );
+            vecNombresColumnas.add( "Precio Venta" );
+            vecNombresColumnas.add( "Importe" );
+            vecNombresColumnas.add( "Existencia" );
+            
+            vecNombresColumnasBD.add ( "cod_barras" );
+            vecNombresColumnasBD.add ( "descripcion" );
+            vecNombresColumnasBD.add ( "precio" );
+            vecNombresColumnasBD.add ( "importe" );
+            vecNombresColumnasBD.add ( "prod_existencia" );
+            
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.INT);
+            
+        }
+    }
+    
+    
+    
+    public void prepararSentenciasSQL ( )
+    {
+         
+       //String valor = jTabLista.getValueAt(jTabLista.getSelectedRow(), 0)+"";
+                    propConsultasSQL = new Properties ( );
 
-    /**
-     * @param args the command line arguments
-     */
+//                    propConsultasSQL.put    (PRODUCTOS_POR_COD_BARRAS, 
+//                                            "SELECT * FROM PRODUCTOS WHERE COD_BARRAS = '"+valor+"'");
+                    
+                    propConsultasSQL.put (   PRODUCTOS_TODOS_POR_NOMBRE,
+                                             "SELECT * FROM PRODUCTOS WHERE PROD_EXISTENCIA < 15 ORDER BY "
+                                                     + "PROD_EXISTENCIA ASC" );
+                    
+                    propConsultasSQL.put (   PRODUCTOS_TODOS_SIN_ORDEN,
+                                             "SELECT * FROM PRODUCTOS" );
+                    
+                    propConsultasSQL.put (   PRODUCTOS_ELIMINAR_POR_CODIGO,
+                                             "DELETE FROM PRODUCTOS WHERE COD_BARRAS = ?" );
+
+//                    propConsultasSQL.put(    PRODUCTOS_ACTUALIZA_DATOS,
+//                                             "UPDATE PRODUCTOS SET DESCRIPCION = ?, PRECIO = ?, "
+//                                           + "IMPORTE = ?, PROD_EXISTENCIA = ? WHERE COD_BARRAS = '"+valor+"'");
+                    
+                    propConsultasSQL.put(    PRODUCTOS_INSERTA_NUEVO,
+                                            "INSERT INTO PRODUCTOS VALUES ( ? , ? , ? , ? , ?)");
+    }
+    
+     public void desplegarRegistros ( String sql, Object[][] args)
+    {
+        
+        ResultSet rs;
+        try
+        {
+            rs = EjecutorSQL.sqlQuery( sql, args );
+            
+            dtmPrincipal = new DefaultTableModel ( vecNombresColumnas , 0 );
+            while( rs.next ( ) )
+            {
+                 Object[] fila = crearFila  ( rs );
+                 dtmPrincipal.addRow ( fila );
+            }
+            
+            rs.close ( );
+                
+            this.jTableVenta.setModel ( dtmPrincipal );
+
+            totRegistros = dtmPrincipal.getRowCount ( ) ;
+            //this.jLabMensajes.setText( totRegistros + " Registros mostrados" );
+            
+        }catch( SQLException ex ){
+            JOptionPane.showMessageDialog ( this, ex, "Error", JOptionPane.INFORMATION_MESSAGE );
+        }
+    }
+     
+     private Object [] crearFila ( ResultSet rs) throws SQLException
+    {
+        if( moduloActual.equals ( TIT_MOD_PROD ) )
+        {
+                 String cod_barras  = rs.getString      ("COD_BARRAS");
+                 String descripcion = rs.getString      ( "Descripcion" );
+                 double precio      = rs.getDouble      ("Precio");
+                 //int  cantidad      = rs.getInt         ("Cantidad");
+                 double importe     = rs.getDouble      ("Importe" );
+                 int prod_existencia= rs.getInt         ("prod_existencia" );
+                 Object[] fila = { cod_barras, descripcion, precio, importe, prod_existencia };
+                 return fila;
+        }else
+            return null;
+    }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -125,7 +276,7 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
         /* Create and display the dialog */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                ModuloProdBajosDeInv dialog = new ModuloProdBajosDeInv(new javax.swing.JFrame(), true);
+                ModuloProdBajosDeInv dialog = new ModuloProdBajosDeInv(new javax.swing.JFrame(), null);
                 dialog.addWindowListener(new java.awt.event.WindowAdapter() {
                     @Override
                     public void windowClosing(java.awt.event.WindowEvent e) {

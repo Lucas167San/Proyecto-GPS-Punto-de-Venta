@@ -37,9 +37,9 @@
                           </Group>
                           <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="jTextField1" min="-2" pref="200" max="-2" attributes="0"/>
+                              <Component id="jTextCodBarras" min="-2" pref="200" max="-2" attributes="0"/>
                               <Component id="jSpinner1" min="-2" pref="80" max="-2" attributes="0"/>
-                              <Component id="jLabel6" min="-2" pref="239" max="-2" attributes="0"/>
+                              <Component id="jLabDescripcion" min="-2" pref="239" max="-2" attributes="0"/>
                               <Component id="jLabel5" alignment="0" min="-2" pref="60" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -61,12 +61,12 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="jTextField1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jTextCodBarras" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
                   <Component id="jLabel2" min="-2" max="-2" attributes="0"/>
-                  <Component id="jLabel6" pref="21" max="32767" attributes="0"/>
+                  <Component id="jLabDescripcion" pref="21" max="32767" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" max="-2" attributes="0">
@@ -91,7 +91,10 @@
         <Property name="text" type="java.lang.String" value="Codigo del producto"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="jTextField1">
+    <Component class="javax.swing.JTextField" name="jTextCodBarras">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextCodBarrasActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">
       <Properties>
@@ -120,7 +123,7 @@
         <Property name="text" type="java.lang.String" value="0.00"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="jLabel6">
+    <Component class="javax.swing.JLabel" name="jLabDescripcion">
       <Properties>
         <Property name="text" type="java.lang.String" value="-"/>
       </Properties>
