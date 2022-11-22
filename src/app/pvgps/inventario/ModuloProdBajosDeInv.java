@@ -19,10 +19,13 @@ import static app.pvgps.principal.ModuloModifProducto.PRODUCTOS_INSERTA_NUEVO;
 import static app.pvgps.principal.ModuloModifProducto.PRODUCTOS_TODOS_POR_NOMBRE;
 import static app.pvgps.principal.ModuloModifProducto.PRODUCTOS_TODOS_SIN_ORDEN;
 import static app.pvgps.principal.ModuloModifProducto.TIT_MOD_PROD;
+import java.awt.print.PrinterException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -77,7 +80,7 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTableVenta = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        jButImprimir = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
@@ -106,7 +109,12 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
         jLabel2.setFont(new java.awt.Font("Segoe UI", 2, 12)); // NOI18N
         jLabel2.setText("A continuación se muestran un listado con productos con inventario debajo de su minimo:");
 
-        jButton1.setText("Imprimir Productos Bajos de Inventario");
+        jButImprimir.setText("Imprimir Productos Bajos de Inventario");
+        jButImprimir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButImprimirActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -120,7 +128,7 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton1)))
+                        .addComponent(jButImprimir)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -131,7 +139,7 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jButton1))
+                    .addComponent(jButImprimir))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 388, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -140,6 +148,14 @@ public class ModuloProdBajosDeInv extends javax.swing.JDialog {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButImprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButImprimirActionPerformed
+        try {
+            jTableVenta.print();
+        } catch (PrinterException ex) {
+            Logger.getLogger(ModuloProdBajosDeInv.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jButImprimirActionPerformed
 public void prepararVista( String modulo )
     {   
         moduloActual = modulo;
@@ -289,7 +305,7 @@ public void prepararVista( String modulo )
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButImprimir;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;

@@ -4,7 +4,9 @@
  */
 package app.pvgps.principal;
 
+import java.awt.event.KeyEvent;
 import javax.swing.JOptionPane;
+import javax.swing.JRootPane;
 
 /**
  *
@@ -15,11 +17,15 @@ public class ModuloCobrar extends javax.swing.JDialog {
     /**
      * Creates new form ModuloCobrar
      */
-    JFramePrincipal frameP = new JFramePrincipal("");
+    JFramePrincipal frameP;
     
     public ModuloCobrar(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        setUndecorated(true);
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         initComponents();
+        jTextTotal.setEditable(false);
+        frameP= (JFramePrincipal) parent;
         jTextPaysWith.requestFocus();
         jTextTotal.setText(frameP.getTotal());
     }
@@ -51,8 +57,10 @@ public class ModuloCobrar extends javax.swing.JDialog {
         jTextPaysWith = new javax.swing.JTextField();
         jLabChange = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
+        jButCancelar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setIconImage(null);
 
         jButCobrar.setText("F12 - COBRAR");
         jButCobrar.addActionListener(new java.awt.event.ActionListener() {
@@ -102,12 +110,27 @@ public class ModuloCobrar extends javax.swing.JDialog {
         jLabel5.setFont(new java.awt.Font("Lucida Console", 3, 18)); // NOI18N
         jLabel5.setText("COBRAR");
 
+        jButCancelar.setText("ESC - CANCELAR");
+        jButCancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButCancelarActionPerformed(evt);
+            }
+        });
+        jButCancelar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jButCancelarKeyTyped(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(78, 78, 78)
+                        .addComponent(jButCobrar, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(33, 33, 33)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -118,14 +141,14 @@ public class ModuloCobrar extends javax.swing.JDialog {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jLabChange, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
                             .addComponent(jTextPaysWith)
-                            .addComponent(jTextTotal)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(38, 38, 38)
-                                .addComponent(jButCobrar, javax.swing.GroupLayout.PREFERRED_SIZE, 117, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(jTextTotal)))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(164, 164, 164)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(92, Short.MAX_VALUE))
+                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 80, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(213, 213, 213)
+                        .addComponent(jButCancelar)))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -148,7 +171,9 @@ public class ModuloCobrar extends javax.swing.JDialog {
                         .addComponent(jLabel3)
                         .addGap(0, 6, Short.MAX_VALUE)))
                 .addGap(18, 18, 18)
-                .addComponent(jButCobrar, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButCobrar, javax.swing.GroupLayout.DEFAULT_SIZE, 62, Short.MAX_VALUE)
+                    .addComponent(jButCancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(34, 34, 34))
         );
 
@@ -162,7 +187,6 @@ public class ModuloCobrar extends javax.swing.JDialog {
 
     private void jTextPaysWithKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextPaysWithKeyPressed
         
-        
     }//GEN-LAST:event_jTextPaysWithKeyPressed
 
     private void jTextPaysWithKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextPaysWithKeyTyped
@@ -175,21 +199,46 @@ public class ModuloCobrar extends javax.swing.JDialog {
 
     private void jTextPaysWithActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextPaysWithActionPerformed
         // TODO add your handling code here:
+        try{
         jLabChange.setText("$"+cobrar()+"");
+        jButCobrar.doClick();
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(this, "Verifique campos");
+            jLabChange.setText("");
+            jTextPaysWith.setText("");
+        }
     }//GEN-LAST:event_jTextPaysWithActionPerformed
 
     private void jButCobrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButCobrarActionPerformed
         // TODO add your handling code here:
-        if(cobrar() < Double.parseDouble(jTextTotal.getText())){
+        if(Double.parseDouble(jTextPaysWith.getText()) < Double.parseDouble(jTextTotal.getText())){
             jLabChange.setText("$-"+cobrar());
             JOptionPane.showMessageDialog(this, "Monto menor al TOTAL");
         }else{
-        frameP.setChange(jLabChange.getText());
-        this.hide();
+        frameP.setChange(cobrar()+"");
+        this.dispose();
+        JOptionPane.showMessageDialog(this, "Cambio: $"+cobrar()+" MXN", "Cobrar", JOptionPane.INFORMATION_MESSAGE);
+        setCobrado(true);
         }
     }//GEN-LAST:event_jButCobrarActionPerformed
 
+    private void jButCancelarKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jButCancelarKeyTyped
+
+    }//GEN-LAST:event_jButCancelarKeyTyped
+
+    private void jButCancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButCancelarActionPerformed
+        // TODO add your handling code here:
+        this.dispose();
+        setCobrado(false);
+    }//GEN-LAST:event_jButCancelarActionPerformed
     
+    private boolean cobrado;
+    public boolean getCobrado(){
+        return cobrado;
+    }
+    public boolean setCobrado (boolean esCobrado){
+        return cobrado = esCobrado;
+    }
     
     
     
@@ -239,6 +288,7 @@ public class ModuloCobrar extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButCancelar;
     private javax.swing.JButton jButCobrar;
     private javax.swing.JLabel jLabChange;
     private javax.swing.JLabel jLabel1;

@@ -10,10 +10,15 @@ import app.pvgps.inventario.ModuloInventario;
 import app.pvgps.inventario.ModuloProdBajosDeInv;
 import app.pvgps.modelo.ModuloProductos;
 import app.pvgps.modelo.Producto;
+import app.pvgps.sesion.JDialogAutorizar;
+import app.pvgps.sesion.JDialogCancelaciones;
 import app.pvgps.sesion.JFrameIniciarSesion;
+import java.awt.Desktop;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.print.PrinterException;
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.sql.ResultSet;
 import java.util.Vector;
@@ -27,6 +32,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JRootPane;
 import mx.tecnm.tap.jdbc.*;
 
 /**
@@ -58,9 +66,12 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private DefaultTableModel   dtmPrincipal;
     private Properties          propConsultasSQL;
     private ArrayList<Producto> array = new ArrayList();
+    private ModuloProductos modulo;
     
     ModuloCobrar cobrar;
-    
+    String tot = "";
+    Double subtotal = 0.0;
+    Double ventasTotales = 0.0;
     @Override
     public Image getIconImage(){
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("app/pvgps/iconos/iconoPestañas.png"));
@@ -79,20 +90,26 @@ public class JFramePrincipal extends javax.swing.JFrame {
     }
     
     
-    
+    String user = "";
     public JFramePrincipal(String usuario) {
         conexionBaseDatos();
-        
+        setUndecorated(true);
+        getRootPane().setWindowDecorationStyle(JRootPane.NONE);
         
         if(ConexionDB.getInstancia().conectado() && usuario.equals("admin")){
+                user = usuario;
                 JOptionPane.showMessageDialog(this, "Bienvenido admin",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
                 initComponents();
                 this.setTitle(TIT_FRAME + " - Administrador");
                 prepararSentenciasSQL ();
+                jMenuClientes.setVisible(false);
+                jMenuConfiguracion.setVisible(false);
             
         }else if (ConexionDB.getInstancia().conectado() && usuario.equals("empleado")){
+            user = usuario;
             JOptionPane.showMessageDialog(this, "Bienvenido empleado",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
             initComponents();
+            
             jMenuClientes.setVisible(false);
             jMenuProductos.setVisible(false);
             jMenuConfiguracion.setVisible(false);
@@ -132,9 +149,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jLabTotProductos = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jTextTotal = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        jButCobrar = new javax.swing.JButton();
         jLabel3 = new javax.swing.JLabel();
         jLabChange = new javax.swing.JLabel();
+        jButEliminarProducto = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuPrint = new javax.swing.JMenuItem();
@@ -151,6 +169,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jMenuItem6 = new javax.swing.JMenuItem();
         jMenuConfiguracion = new javax.swing.JMenu();
         jMenuCorte = new javax.swing.JMenu();
+        jMenuReporteGanancias = new javax.swing.JMenuItem();
         jMenu7 = new javax.swing.JMenu();
         jMenuAbout = new javax.swing.JMenuItem();
         jMenuUserManual = new javax.swing.JMenuItem();
@@ -175,14 +194,14 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jTableVenta.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null}
+                {null, null, null, null, null}
             },
             new String [] {
-                "Codigo de barras", "Descripción del producto", "Precio Venta", "Cantidad", "Importe", "Existencia"
+                "Codigo de barras", "Descripción del producto", "Precio Venta", "Importe", "Existencia"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false
+                false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -193,7 +212,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         if (jTableVenta.getColumnModel().getColumnCount() > 0) {
             jTableVenta.getColumnModel().getColumn(0).setPreferredWidth(150);
             jTableVenta.getColumnModel().getColumn(1).setPreferredWidth(300);
-            jTableVenta.getColumnModel().getColumn(5).setPreferredWidth(50);
+            jTableVenta.getColumnModel().getColumn(4).setPreferredWidth(50);
         }
 
         jLabel2.setText("TOTAL PRODUCTOS:");
@@ -213,10 +232,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("F12 - COBRAR");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButCobrar.setText("F12 - COBRAR");
+        jButCobrar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButCobrarActionPerformed(evt);
             }
         });
 
@@ -225,6 +244,13 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jLabChange.setFont(new java.awt.Font("Lucida Console", 3, 18)); // NOI18N
         jLabChange.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabChange.setText("$0.00");
+
+        jButEliminarProducto.setText("Eliminar Producto");
+        jButEliminarProducto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButEliminarProductoActionPerformed(evt);
+            }
+        });
 
         jMenu1.setText("Archivo");
 
@@ -293,6 +319,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
         jMenuInventario.setText("Inventario");
 
+        jMenuItem4.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/inventario.png"))); // NOI18N
         jMenuItem4.setText("Agregar a inventario");
         jMenuItem4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -301,6 +328,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         });
         jMenuInventario.add(jMenuItem4);
 
+        jMenuItem5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/inventario.png"))); // NOI18N
         jMenuItem5.setText("Ajustes de inventario");
         jMenuItem5.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -309,6 +337,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         });
         jMenuInventario.add(jMenuItem5);
 
+        jMenuItem6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/inventario.png"))); // NOI18N
         jMenuItem6.setText("Productos Bajos de Inventario");
         jMenuItem6.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -323,10 +352,21 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jMenuBar1.add(jMenuConfiguracion);
 
         jMenuCorte.setText("Corte");
+
+        jMenuReporteGanancias.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/corte.png"))); // NOI18N
+        jMenuReporteGanancias.setText("Hacer corte");
+        jMenuReporteGanancias.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuReporteGananciasActionPerformed(evt);
+            }
+        });
+        jMenuCorte.add(jMenuReporteGanancias);
+
         jMenuBar1.add(jMenuCorte);
 
         jMenu7.setText("Ayuda");
 
+        jMenuAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/informacion.png"))); // NOI18N
         jMenuAbout.setText("Acerca de...");
         jMenuAbout.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -335,7 +375,13 @@ public class JFramePrincipal extends javax.swing.JFrame {
         });
         jMenu7.add(jMenuAbout);
 
+        jMenuUserManual.setIcon(new javax.swing.ImageIcon(getClass().getResource("/app/pvgps/iconos/manual.png"))); // NOI18N
         jMenuUserManual.setText("Manual de usuario");
+        jMenuUserManual.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuUserManualActionPerformed(evt);
+            }
+        });
         jMenu7.add(jMenuUserManual);
 
         jMenuBar1.add(jMenu7);
@@ -357,7 +403,9 @@ public class JFramePrincipal extends javax.swing.JFrame {
                         .addComponent(jTextCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 400, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(jButAgregarProducto)
-                        .addGap(0, 165, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jButEliminarProducto)
+                        .addGap(0, 26, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2)
@@ -373,7 +421,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabChange, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jButCobrar, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addGap(99, 99, 99)))))
                 .addContainerGap())
         );
@@ -384,7 +432,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jTextCodigo, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel1)
-                    .addComponent(jButAgregarProducto))
+                    .addComponent(jButAgregarProducto)
+                    .addComponent(jButEliminarProducto))
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 322, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -395,7 +444,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
                     .addComponent(jTextTotal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButCobrar, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabChange, javax.swing.GroupLayout.DEFAULT_SIZE, 48, Short.MAX_VALUE)
                         .addComponent(jLabel3)))
@@ -416,6 +465,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private void jButAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButAgregarProductoActionPerformed
         // TODO add your handling code here:   
         try{
+        Double total = 0.0;
         prepararSentenciasSQL();
         prepararVista(TIT_MOD_PROD);
         String sql = propConsultasSQL.getProperty( PRODUCTOS_POR_COD_BARRAS );
@@ -435,7 +485,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         
         modelo.setRowCount(array.size());
         modelo.setColumnCount(5);
-        Double total = 0.0;
+        
         for (int j = 0; j < array.size(); j++) {
             modelo.setValueAt(array.get(j).getCodBarras(), j, 0);
             modelo.setValueAt(array.get(j).getDescripcion(), j, 1);
@@ -445,7 +495,11 @@ public class JFramePrincipal extends javax.swing.JFrame {
            
             total += array.get(j).getPrecio();
         }
+        
+        subtotal = total;
         jTextTotal.setText(total+"");
+        setTotal(total+"");
+
         }catch(Exception ex){
             JOptionPane.showMessageDialog(this, "Producto no encontrado.", "Producto", JOptionPane.ERROR_MESSAGE);
         }    
@@ -464,8 +518,16 @@ public class JFramePrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenuPrintActionPerformed
 
     private void jMenuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuExitActionPerformed
+        JDialogAutorizar dialog = new JDialogAutorizar(this,true);
+        if(user.equals("admin")){
         ConexionDB.getInstancia().desconectar();
-        this.dispose();
+        System.exit(0);
+        }else if(user.equals("empleado") ){
+            JOptionPane.showMessageDialog(this, "Sonrie. Llame a su supervisor para cerrar la sesión");
+            jMenuReporteGanancias.doClick();
+            dialog.setVisible(true);
+        }
+        
         // TODO add your handling code here:
     }//GEN-LAST:event_jMenuExitActionPerformed
 
@@ -508,20 +570,22 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem4ActionPerformed
         // TODO add your handling code here:
-        ModuloInventario modinv = new ModuloInventario(this,null);
-        
-        modinv.setVisible(true);
-        
+//        ModuloInventario modinv = new ModuloInventario(this,null);
+//        
+//        modinv.setVisible(true);
+        JOptionPane.showMessageDialog(this, "PROXIMAMENTE");
         
         
     }//GEN-LAST:event_jMenuItem4ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
         // TODO add your handling code here:
-        ModuloInventario modinv = new ModuloInventario(this,null);
+//        ModuloInventario modinv = new ModuloInventario(this,null);
+//        
+//        modinv.setVisible(true);
         
-        modinv.setVisible(true);
-        
+            JOptionPane.showMessageDialog(this, "PROXIMAMENTE");
+
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
     private void jMenuItem6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem6ActionPerformed
@@ -531,15 +595,37 @@ public class JFramePrincipal extends javax.swing.JFrame {
         modulo.setVisible(true);
     }//GEN-LAST:event_jMenuItem6ActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButCobrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButCobrarActionPerformed
         cobrar = new ModuloCobrar(this, true);
-        
-        
-        
         cobrar.setVisible(true);
         
+        if(cobrar.getCobrado()){
+        for (int i = 0; i < array.size(); i++) {
+         String sql = "UPDATE PRODUCTOS SET PROD_EXISTENCIA = PROD_EXISTENCIA-1 "
+                    + "WHERE COD_BARRAS = '"+array.get(i).getCodBarras()+"'";
+        try {
+             int registros = EjecutorSQL.sqlEjecutar( sql , null );
+             if ( registros == array.size() )
+             {
+                
+             }
+          
+         } catch ( SQLException ex ) {
+             dialogoMensaje( ex.toString() ); 
+         }
+        }
+        
+        jTextTotal.setText("$0.00");
+        ventasTotales += subtotal;
+        subtotal = 0.00;
+        prepararVista(TIT_MOD_PROD);
+        array.removeAll(array);
+        jTextCodigo.requestFocus();
         jLabChange.setText(cobrar.getChange());
-    }//GEN-LAST:event_jButton1ActionPerformed
+
+        
+        }
+    }//GEN-LAST:event_jButCobrarActionPerformed
 
     private void jTextTotalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextTotalActionPerformed
         // TODO add your handling code here:
@@ -547,15 +633,127 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuLogOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuLogOutActionPerformed
         // TODO add your handling code here:
+        JDialogAutorizar dialog = new JDialogAutorizar(this,true);
+        JFrameIniciarSesion sesion = new JFrameIniciarSesion();
+        if(user.equals("admin")){
         ConexionDB.getInstancia().desconectar();
         dispose();
-        JFrameIniciarSesion frame = new JFrameIniciarSesion();
-        frame.setVisible(true);
+        sesion.setVisible(true);
+        } else if(user.equals("empleado") ){
+            JOptionPane.showMessageDialog(this, "Sonrie. Llame a su supervisor para cerrar la sesión");
+            jMenuReporteGanancias.doClick();
+            dialog.setVisible(true);
+        }
+        
+        
+        
     }//GEN-LAST:event_jMenuLogOutActionPerformed
 
-    public String getTotal(){
-        return jTextTotal.getText();
+    private void jMenuReporteGananciasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuReporteGananciasActionPerformed
+        // TODO add your handling code here:
+        
+        JOptionPane.showMessageDialog(this, "VentasTotales en el dia: $"+ventasTotales);
+        
+    }//GEN-LAST:event_jMenuReporteGananciasActionPerformed
+
+    private void jButEliminarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButEliminarProductoActionPerformed
+        // TODO add your handling code here:
+        JDialogCancelaciones dialog = new JDialogCancelaciones(this,true);
+        if(user.equals("empleado") ){
+            JOptionPane.showMessageDialog(this, "Sonrie. Llame a su supervisor para Cancelación de producto");
+            dialog.setVisible(true);
+            
+            if(dialog.isAutorizado()){
+            int confirma = JOptionPane.showConfirmDialog(this, "Seguro que quieres borrar", "Mensaje", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            
+            if(confirma == JOptionPane.YES_OPTION){
+           try{
+        Double total = 0.0;
+        array.remove(jTableVenta.getSelectedRow());
+        modelo = new DefaultTableModel(vecNombresColumnas, array.size());
+        jTableVenta.setModel(modelo);
+        jTextCodigo.setText("");
+        jLabTotProductos.setText(array.size()+"");
+        
+        modelo.setRowCount(array.size());
+        modelo.setColumnCount(5);
+        
+        for (int j = 0; j < array.size(); j++) {
+            modelo.setValueAt(array.get(j).getCodBarras(), j, 0);
+            modelo.setValueAt(array.get(j).getDescripcion(), j, 1);
+            modelo.setValueAt(array.get(j).getPrecio(), j, 2);
+            modelo.setValueAt(array.get(j).getImporte(), j, 3);
+            modelo.setValueAt(array.get(j).getExistencia(), j, 4);
+           
+            total += array.get(j).getPrecio();
+        }
+        
+        subtotal = total;
+        jTextTotal.setText(total+"");
+        setTotal(total+"");
+        } catch(Exception ex){
+            JOptionPane.showMessageDialog(this, "seleccione un producto");
+          }
+         }
+        }
+       }else if(user.equals("admin")){
+            int confirma = JOptionPane.showConfirmDialog(this, "Seguro que quieres borrar", "Mensaje", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            
+            if(confirma == JOptionPane.YES_OPTION){
+           try{
+        Double total = 0.0;
+        array.remove(jTableVenta.getSelectedRow());
+        modelo = new DefaultTableModel(vecNombresColumnas, array.size());
+        jTableVenta.setModel(modelo);
+        jTextCodigo.setText("");
+        jLabTotProductos.setText(array.size()+"");
+        
+        modelo.setRowCount(array.size());
+        modelo.setColumnCount(5);
+        
+        for (int j = 0; j < array.size(); j++) {
+            modelo.setValueAt(array.get(j).getCodBarras(), j, 0);
+            modelo.setValueAt(array.get(j).getDescripcion(), j, 1);
+            modelo.setValueAt(array.get(j).getPrecio(), j, 2);
+            modelo.setValueAt(array.get(j).getImporte(), j, 3);
+            modelo.setValueAt(array.get(j).getExistencia(), j, 4);
+           
+            total += array.get(j).getPrecio();
+        }
+        
+        subtotal = total;
+        jTextTotal.setText(total+"");
+        setTotal(total+"");
+        } catch(Exception ex){
+            JOptionPane.showMessageDialog(this, "seleccione un producto");
+          }
+         }
+        }
+        
+        
+    }//GEN-LAST:event_jButEliminarProductoActionPerformed
+
+    private void jMenuUserManualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuUserManualActionPerformed
+        // TODO add your handling code here:
+        
+        try {
+        File myFile = new File("./MANUAL-DE-USUARIO-EMAV.pdf");
+        Desktop.getDesktop().open(myFile);
+    } catch (IOException ex) {
+        // no application registered for PDFs
+        JOptionPane.showMessageDialog(this, "Error al abrir el archivo");
     }
+        
+    }//GEN-LAST:event_jMenuUserManualActionPerformed
+    
+    public void setTotal(String total){
+        tot = total;
+    }
+    
+    public String getTotal(){
+        return tot;
+    }
+    
     
     public void setChange(String cambio){
         jLabChange.setText(cambio);
@@ -669,6 +867,34 @@ public class JFramePrincipal extends javax.swing.JFrame {
         }else
             return null;
     }
+     
+     private boolean validarDatos()
+        {
+            for (int i = 0; i < array.size(); i++) {
+                
+            
+            String cod_barras =  array.get(i).getCodBarras();
+            
+            
+            String descripcion   =  array.get(i).getDescripcion();
+            
+            
+            double precio_costo = array.get(i).getPrecio();
+            
+            double importe = array.get(i).getImporte();
+            
+            int prod_existencia = array.get(i).getExistencia();
+            
+            modulo = new ModuloProductos(cod_barras, descripcion, precio_costo, importe, prod_existencia );
+            
+            }
+            return true;
+        }
+     
+     private void dialogoMensaje( String mensaje )
+        {
+            JOptionPane.showMessageDialog( this, mensaje, "Error", JOptionPane.ERROR_MESSAGE );
+        }
     
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -704,7 +930,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButAgregarProducto;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButCobrar;
+    private javax.swing.JButton jButEliminarProducto;
     private javax.swing.JLabel jLabChange;
     private javax.swing.JLabel jLabTotProductos;
     private javax.swing.JLabel jLabel1;
@@ -729,6 +956,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuNuevoProducto;
     private javax.swing.JMenuItem jMenuPrint;
     private javax.swing.JMenu jMenuProductos;
+    private javax.swing.JMenuItem jMenuReporteGanancias;
     private javax.swing.JMenuItem jMenuUserManual;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTableVenta;
@@ -780,16 +1008,13 @@ public class JFramePrincipal extends javax.swing.JFrame {
     public JButton getJButAgregarProducto() {
         return jButAgregarProducto;
     }
-////-------------------------------------------------------------------------------------------- 
-//    public JButton getjButModulo2() {
-//        return jButModulo2;
-//    }
-////-------------------------------------------------------------------------------------------- 
-//    public JButton getjButModulo3() {
-//        return jButModulo3;
-//    }
-//--------------------------------------------------------------------------------------------      
     
+    public JMenuItem getJMenuSalir(){
+        return jMenuExit;
+    }
     
+    public JMenuItem getJMenuCorte(){
+        return jMenuReporteGanancias;
+    }   
     
 }

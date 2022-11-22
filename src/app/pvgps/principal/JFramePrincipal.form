@@ -96,6 +96,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem4">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/app/pvgps/iconos/inventario.png"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Agregar a inventario"/>
               </Properties>
               <Events>
@@ -104,6 +107,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem5">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/app/pvgps/iconos/inventario.png"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Ajustes de inventario"/>
               </Properties>
               <Events>
@@ -112,6 +118,9 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuItem6">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/app/pvgps/iconos/inventario.png"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Productos Bajos de Inventario"/>
               </Properties>
               <Events>
@@ -129,6 +138,19 @@
           <Properties>
             <Property name="text" type="java.lang.String" value="Corte"/>
           </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JMenuItem" name="jMenuReporteGanancias">
+              <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/app/pvgps/iconos/corte.png"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="Hacer corte"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuReporteGananciasActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
         </Menu>
         <Menu class="javax.swing.JMenu" name="jMenu7">
           <Properties>
@@ -137,6 +159,9 @@
           <SubComponents>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuAbout">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/app/pvgps/iconos/informacion.png"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Acerca de..."/>
               </Properties>
               <Events>
@@ -145,8 +170,14 @@
             </MenuItem>
             <MenuItem class="javax.swing.JMenuItem" name="jMenuUserManual">
               <Properties>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/app/pvgps/iconos/manual.png"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Manual de usuario"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuUserManualActionPerformed"/>
+              </Events>
             </MenuItem>
           </SubComponents>
         </Menu>
@@ -190,7 +221,9 @@
                       <Component id="jTextCodigo" min="-2" pref="400" max="-2" attributes="0"/>
                       <EmptySpace type="separate" max="-2" attributes="0"/>
                       <Component id="jButAgregarProducto" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="165" max="32767" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="jButEliminarProducto" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace min="0" pref="26" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Group type="103" groupAlignment="0" attributes="0">
@@ -209,7 +242,7 @@
                           <Group type="102" attributes="0">
                               <Component id="jLabChange" min="-2" pref="134" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
-                              <Component id="jButton1" min="-2" pref="114" max="-2" attributes="0"/>
+                              <Component id="jButCobrar" min="-2" pref="114" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="99" max="-2" attributes="0"/>
                           </Group>
                       </Group>
@@ -227,6 +260,7 @@
                   <Component id="jTextCodigo" alignment="3" min="-2" pref="36" max="-2" attributes="0"/>
                   <Component id="jLabel1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jButAgregarProducto" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="jButEliminarProducto" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="jScrollPane1" min="-2" pref="322" max="-2" attributes="0"/>
@@ -239,7 +273,7 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="jButton1" min="-2" pref="37" max="-2" attributes="0"/>
+                  <Component id="jButCobrar" min="-2" pref="37" max="-2" attributes="0"/>
                   <Group type="103" alignment="0" groupAlignment="3" attributes="0">
                       <Component id="jLabChange" alignment="3" pref="48" max="32767" attributes="0"/>
                       <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -279,11 +313,10 @@
         <Component class="javax.swing.JTable" name="jTableVenta">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="6" rowCount="1">
+              <Table columnCount="5" rowCount="1">
                 <Column editable="false" title="Codigo de barras" type="java.lang.Object"/>
                 <Column editable="false" title="Descripci&#xf3;n del producto" type="java.lang.Object"/>
                 <Column editable="false" title="Precio Venta" type="java.lang.Object"/>
-                <Column editable="false" title="Cantidad" type="java.lang.Object"/>
                 <Column editable="false" title="Importe" type="java.lang.Object"/>
                 <Column editable="false" title="Existencia" type="java.lang.Object"/>
               </Table>
@@ -296,11 +329,6 @@
                   <Renderer/>
                 </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="300" resizable="true">
-                  <Title/>
-                  <Editor/>
-                  <Renderer/>
-                </Column>
-                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title/>
                   <Editor/>
                   <Renderer/>
@@ -360,12 +388,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jTextTotalActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="jButton1">
+    <Component class="javax.swing.JButton" name="jButCobrar">
       <Properties>
         <Property name="text" type="java.lang.String" value="F12 - COBRAR"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButCobrarActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel3">
@@ -381,6 +409,14 @@
         <Property name="horizontalAlignment" type="int" value="0"/>
         <Property name="text" type="java.lang.String" value="$0.00"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButEliminarProducto">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Eliminar Producto"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButEliminarProductoActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
