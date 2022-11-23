@@ -740,7 +740,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         // TODO add your handling code here:
         
         try {
-        File myFile = new File("./MANUAL-DE-USUARIO-EMAV.pdf");
+        File myFile = new File("./src/app/pvgps/manual/MANUAL-DE-USUARIO-EMAV.pdf");
         Desktop.getDesktop().open(myFile);
     } catch (IOException ex) {
         // no application registered for PDFs
