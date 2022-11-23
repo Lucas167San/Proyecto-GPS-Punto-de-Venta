@@ -20,6 +20,8 @@ import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.ResultSet;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -738,14 +740,17 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jMenuUserManualActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuUserManualActionPerformed
         // TODO add your handling code here:
+        //File myFile = new File("./src/app/pvgps/manual/MANUAL-DE-USUARIO-EMAV.pdf"); // no application registered for PDFs
+        Desktop desktop = Desktop.getDesktop();
         
         try {
-        File myFile = new File("./src/app/pvgps/manual/MANUAL-DE-USUARIO-EMAV.pdf");
-        Desktop.getDesktop().open(myFile);
-    } catch (IOException ex) {
-        // no application registered for PDFs
-        JOptionPane.showMessageDialog(this, "Error al abrir el archivo");
-    }
+            URI uri = new URI("https://drive.google.com/file/d/1jGORWKvHw7zmiI3v3vq24zaHbupDXFGz/view?usp=share_link");
+            desktop.browse(uri);
+        } catch (IOException ex) {
+            Logger.getLogger(JFramePrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(JFramePrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
     }//GEN-LAST:event_jMenuUserManualActionPerformed
     
