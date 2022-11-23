@@ -187,8 +187,8 @@ public void prepararVista( String modulo )
             
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
             vecTiposColumnas.add     ( EjecutorSQL.INT);
             
         }

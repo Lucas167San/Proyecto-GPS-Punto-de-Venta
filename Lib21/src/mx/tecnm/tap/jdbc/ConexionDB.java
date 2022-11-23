@@ -72,7 +72,7 @@ public class ConexionDB {
 
 //---------------------------------------------------------------------------------------------------
     //metodo que sirve para hacer la conexion a la base de datos
-    public static SQLException exception;
+   
     public void conectar(String dbms,String servidor, String puerto,  
                          String bd, String usuario, String contraseña)
     {
@@ -110,8 +110,6 @@ public class ConexionDB {
         } catch (ClassNotFoundException ex) {
             System.out.println(ex);
         } catch (SQLException ex) {
-            
-             exception = ex;
              System.out.println(ex);
         }
                 

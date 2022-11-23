@@ -25,3 +25,4 @@ replay_pid*
 /Lib21/build/
 /Lib21/nbproject/private/
 nbproject/private/private.properties
+/dist/

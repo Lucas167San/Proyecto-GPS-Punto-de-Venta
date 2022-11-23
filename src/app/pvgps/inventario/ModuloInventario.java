@@ -48,6 +48,7 @@ public class ModuloInventario extends javax.swing.JDialog {
     public static final String EDITAR_PROD                      = "Editar";
     
     private JFramePrincipal    frmPrincipal;
+    private EjecutorSQL        ejecutor;
     private String              moduloActual;
     private int                 totRegistros;
     private Vector<String>      vecNombresColumnas;
@@ -55,7 +56,7 @@ public class ModuloInventario extends javax.swing.JDialog {
     private Vector<String>      vecTiposColumnas;
     private DefaultTableModel   dtmPrincipal;
     private Properties          propConsultasSQL;
-    private ArrayList<Producto> array = new ArrayList();
+    private ArrayList<Producto> array = new ArrayList<Producto>();
     
     protected void conexionBaseDatos()
     {
@@ -206,7 +207,7 @@ public class ModuloInventario extends javax.swing.JDialog {
         dtmPrincipal = new DefaultTableModel( vecNombresColumnas, 0 );
        // this.jTableVenta.setModel ( dtmPrincipal );
     }
-    
+    @SuppressWarnings("unchecked")
     public void determinarNombresColumnas( String modulo )
     {
         vecNombresColumnas      = new Vector<String>    ( );
@@ -227,12 +228,14 @@ public class ModuloInventario extends javax.swing.JDialog {
             vecNombresColumnasBD.add ( "importe" );
             vecNombresColumnasBD.add ( "prod_existencia" );
             
-            vecTiposColumnas.add     ( EjecutorSQL.STRING);
-            vecTiposColumnas.add     ( EjecutorSQL.STRING);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
-            vecTiposColumnas.add     ( EjecutorSQL.INT);
             
+            
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.STRING);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
+            vecTiposColumnas.add     ( EjecutorSQL.INT);
+        
         }
     }
     

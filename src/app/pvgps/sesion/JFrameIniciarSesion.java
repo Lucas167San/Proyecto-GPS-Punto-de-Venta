@@ -131,7 +131,7 @@ public class JFrameIniciarSesion extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
         
-    
+    @SuppressWarnings("unchecked")
     private void jButLoginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButLoginActionPerformed
         // TODO add your handling code here:
         

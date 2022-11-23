@@ -187,8 +187,8 @@ public class ModuloModifProducto extends javax.swing.JDialog {
             
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
             vecTiposColumnas.add     ( EjecutorSQL.INT);
             
         }
@@ -265,6 +265,7 @@ public class ModuloModifProducto extends javax.swing.JDialog {
             return null;
     }
     
+    @SuppressWarnings("unchecked")
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

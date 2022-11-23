@@ -35,6 +35,8 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenuItem;
 import javax.swing.JRootPane;
+import mx.tecnm.tap.jdbc.ConexionDB;
+import mx.tecnm.tap.jdbc.EjecutorSQL;
 import mx.tecnm.tap.jdbc.*;
 
 /**
@@ -65,6 +67,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private Vector<String>      vecTiposColumnas;
     private DefaultTableModel   dtmPrincipal;
     private Properties          propConsultasSQL;
+    @SuppressWarnings("unchecked")
     private ArrayList<Producto> array = new ArrayList();
     private ModuloProductos modulo;
     
@@ -89,7 +92,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         
     }
     
-    
+    @SuppressWarnings("unchecked")
     String user = "";
     public JFramePrincipal(String usuario) {
         conexionBaseDatos();
@@ -118,7 +121,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
             this.setTitle(TIT_FRAME + " - Empleado");
                 prepararSentenciasSQL ();
         }else {
-            JOptionPane.showMessageDialog(this, ConexionDB.exception.getMessage()+"",TIT_INICIO,JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "error en el inicio de sesion",TIT_INICIO,JOptionPane.ERROR_MESSAGE);
             ConexionDB.getInstancia().desconectar();
             System.exit(0);
            }
@@ -225,7 +228,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jTextTotal.setEditable(false);
         jTextTotal.setBackground(new java.awt.Color(102, 255, 255));
         jTextTotal.setFont(new java.awt.Font("Calibri", 2, 36)); // NOI18N
-        jTextTotal.setText("398");
+        jTextTotal.setText("$0.00");
         jTextTotal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextTotalActionPerformed(evt);
@@ -790,8 +793,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
             
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
             vecTiposColumnas.add     ( EjecutorSQL.INT);
             
         }

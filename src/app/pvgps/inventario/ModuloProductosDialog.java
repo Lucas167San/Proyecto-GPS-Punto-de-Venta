@@ -221,7 +221,7 @@ public class ModuloProductosDialog extends javax.swing.JDialog {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
-
+@SuppressWarnings("unchecked")
     private void jButGuardarProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButGuardarProdActionPerformed
         // TODO add your handling code here:
         Object [][] args = null;
@@ -249,8 +249,8 @@ public class ModuloProductosDialog extends javax.swing.JDialog {
             
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
             vecTiposColumnas.add     ( EjecutorSQL.STRING);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
-            vecTiposColumnas.add     ( EjecutorSQL.DOUBLE);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
+            vecTiposColumnas.add     ( EjecutorSQL.FLOAT);
             vecTiposColumnas.add     ( EjecutorSQL.INT);
             mensaje = "El registro ha sido actualizado.";
             
