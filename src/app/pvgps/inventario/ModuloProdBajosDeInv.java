@@ -206,7 +206,7 @@ public void prepararVista( String modulo )
 //                                            "SELECT * FROM PRODUCTOS WHERE COD_BARRAS = '"+valor+"'");
                     
                     propConsultasSQL.put (   PRODUCTOS_TODOS_POR_NOMBRE,
-                                             "SELECT * FROM PRODUCTOS WHERE PROD_EXISTENCIA < 15 ORDER BY "
+                                             "SELECT * FROM PRODUCTOS WHERE PROD_EXISTENCIA < 7 ORDER BY "
                                                      + "PROD_EXISTENCIA ASC" );
                     
                     propConsultasSQL.put (   PRODUCTOS_TODOS_SIN_ORDEN,

@@ -30,6 +30,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import mx.tecnm.tap.extras.AcercaDeDialog;
 import java.sql.SQLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
@@ -69,14 +70,14 @@ public class JFramePrincipal extends javax.swing.JFrame {
     private Vector<String>      vecTiposColumnas;
     private DefaultTableModel   dtmPrincipal;
     private Properties          propConsultasSQL;
-    @SuppressWarnings("unchecked")
-    private ArrayList<Producto> array = new ArrayList();
+    private ArrayList<Producto> array = new ArrayList<Producto>();
     private ModuloProductos modulo;
     
     ModuloCobrar cobrar;
     String tot = "";
     Double subtotal = 0.0;
     Double ventasTotales = 0.0;
+    
     @Override
     public Image getIconImage(){
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("app/pvgps/iconos/iconoPestañas.png"));
@@ -94,7 +95,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         
     }
     
-    @SuppressWarnings("unchecked")
+    
     String user = "";
     public JFramePrincipal(String usuario) {
         conexionBaseDatos();
@@ -103,7 +104,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         
         if(ConexionDB.getInstancia().conectado() && usuario.equals("admin")){
                 user = usuario;
-                JOptionPane.showMessageDialog(this, "Bienvenido admin",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Bienvenido Administrador",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
                 initComponents();
                 this.setTitle(TIT_FRAME + " - Administrador");
                 prepararSentenciasSQL ();
@@ -112,7 +113,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
             
         }else if (ConexionDB.getInstancia().conectado() && usuario.equals("empleado")){
             user = usuario;
-            JOptionPane.showMessageDialog(this, "Bienvenido empleado",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Bienvenido Empleado",TIT_INICIO, JOptionPane.INFORMATION_MESSAGE);
             initComponents();
             
             jMenuClientes.setVisible(false);
@@ -120,10 +121,11 @@ public class JFramePrincipal extends javax.swing.JFrame {
             jMenuConfiguracion.setVisible(false);
             jMenuCorte.setVisible(false);
             jMenuInventario.setVisible(false);
+            jMenuUserManual.setVisible(false);
             this.setTitle(TIT_FRAME + " - Empleado");
                 prepararSentenciasSQL ();
         }else {
-            JOptionPane.showMessageDialog(this, "error en el inicio de sesion",TIT_INICIO,JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Contacte al proveedor del punto de venta.",TIT_INICIO,JOptionPane.ERROR_MESSAGE);
             ConexionDB.getInstancia().desconectar();
             System.exit(0);
            }
@@ -179,7 +181,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         jMenuAbout = new javax.swing.JMenuItem();
         jMenuUserManual = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setIconImage(getIconImage());
 
         jLabel1.setText("Codigo de producto:");
@@ -469,8 +471,10 @@ public class JFramePrincipal extends javax.swing.JFrame {
 
     private void jButAgregarProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButAgregarProductoActionPerformed
         // TODO add your handling code here:   
-        try{
+        DecimalFormat formato = new DecimalFormat("###.##");
         Double total = 0.0;
+        try{
+        
         prepararSentenciasSQL();
         prepararVista(TIT_MOD_PROD);
         String sql = propConsultasSQL.getProperty( PRODUCTOS_POR_COD_BARRAS );
@@ -484,13 +488,13 @@ public class JFramePrincipal extends javax.swing.JFrame {
                                 ));
         
         modelo = new DefaultTableModel(vecNombresColumnas, array.size());
-        jTableVenta.setModel(modelo);
+        
         jTextCodigo.setText("");
         jLabTotProductos.setText(array.size()+"");
         
         modelo.setRowCount(array.size());
         modelo.setColumnCount(5);
-        
+        jTableVenta.setModel(modelo);
         for (int j = 0; j < array.size(); j++) {
             modelo.setValueAt(array.get(j).getCodBarras(), j, 0);
             modelo.setValueAt(array.get(j).getDescripcion(), j, 1);
@@ -498,14 +502,33 @@ public class JFramePrincipal extends javax.swing.JFrame {
             modelo.setValueAt(array.get(j).getImporte(), j, 3);
             modelo.setValueAt(array.get(j).getExistencia(), j, 4);
            
-            total += array.get(j).getPrecio();
+            total += array.get(j).getImporte();
         }
         
         subtotal = total;
+        formato.format(total);
         jTextTotal.setText(total+"");
         setTotal(total+"");
 
         }catch(Exception ex){
+            modelo = new DefaultTableModel(vecNombresColumnas, array.size());
+            jTextCodigo.setText("");
+            jTextCodigo.requestFocus();
+            jTableVenta.setModel(modelo);
+            modelo.setRowCount(array.size());
+            modelo.setColumnCount(5);
+            for (int j = 0; j < array.size(); j++) {
+            modelo.setValueAt(array.get(j).getCodBarras(), j, 0);
+            modelo.setValueAt(array.get(j).getDescripcion(), j, 1);
+            modelo.setValueAt(array.get(j).getPrecio(), j, 2);
+            modelo.setValueAt(array.get(j).getImporte(), j, 3);
+            modelo.setValueAt(array.get(j).getExistencia(), j, 4);
+           
+            total += array.get(j).getPrecio();
+            subtotal = total;
+            jTextTotal.setText(total+"");
+            setTotal(total+"");
+        }
             JOptionPane.showMessageDialog(this, "Producto no encontrado.", "Producto", JOptionPane.ERROR_MESSAGE);
         }    
         
@@ -526,6 +549,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         JDialogAutorizar dialog = new JDialogAutorizar(this,true);
         if(user.equals("admin")){
         ConexionDB.getInstancia().desconectar();
+        jMenuReporteGanancias.doClick();
         System.exit(0);
         }else if(user.equals("empleado") ){
             JOptionPane.showMessageDialog(this, "Sonrie. Llame a su supervisor para cerrar la sesión");
@@ -642,6 +666,7 @@ public class JFramePrincipal extends javax.swing.JFrame {
         JFrameIniciarSesion sesion = new JFrameIniciarSesion();
         if(user.equals("admin")){
         ConexionDB.getInstancia().desconectar();
+        jMenuReporteGanancias.doClick();
         dispose();
         sesion.setVisible(true);
         } else if(user.equals("empleado") ){
@@ -786,8 +811,8 @@ public class JFramePrincipal extends javax.swing.JFrame {
         {
             vecNombresColumnas.add( "Codigo de Barras" );
             vecNombresColumnas.add( "Descripción" );
+            vecNombresColumnas.add( "Precio Costo" );
             vecNombresColumnas.add( "Precio Venta" );
-            vecNombresColumnas.add( "Importe" );
             vecNombresColumnas.add( "Existencia" );
             
             vecNombresColumnasBD.add ( "cod_barras" );

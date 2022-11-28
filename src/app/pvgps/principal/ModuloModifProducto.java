@@ -175,8 +175,8 @@ public class ModuloModifProducto extends javax.swing.JDialog {
         {
             vecNombresColumnas.add( "Codigo de Barras" );
             vecNombresColumnas.add( "Descripción" );
-            vecNombresColumnas.add( "Precio Venta" );
             vecNombresColumnas.add( "Importe" );
+            vecNombresColumnas.add( "Precio Venta" );
             vecNombresColumnas.add( "Existencia" );
             
             vecNombresColumnasBD.add ( "cod_barras" );

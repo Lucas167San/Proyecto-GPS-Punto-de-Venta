@@ -161,6 +161,8 @@ public class ModuloModificarEliminar extends javax.swing.JDialog {
 //                frmPrincipal.getJButAgregarProducto().doClick();
                 JOptionPane.showMessageDialog( this , "El registro ha sido eliminado ", "Eliminar",
                         JOptionPane.INFORMATION_MESSAGE );
+                jTextCodBarras.setText("");
+                jTextCodBarras.requestFocus();
             }else {
                 JOptionPane.showMessageDialog(this, "No se encontró el producto", "Eliminar", 
                         JOptionPane.INFORMATION_MESSAGE);
